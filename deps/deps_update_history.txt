@@ -1,0 +1,11 @@
+Updating dependencies - Fri Jan 05 15:30:10 2018 +0100
+Dependency: gl3w
+8f7f459, Thu Dec 14 14:01:25 2017 +0200 : dlopen with RTLD_LOCAL.
+Dependency: glfw
+999f355, Wed Aug 17 16:48:22 2016 +0200 : Documentation work
+Dependency: imgui
+9f200d1, Fri Oct 27 17:10:41 2017 +0200 : Version 1.52
+Dependency: stb_image
+555efbe, Sun Jul 23 14:09:39 2017 -0700 : Update version numbers
+------------------------------------------------------
+
