@@ -51,3 +51,7 @@ Texture rm_load_texture(const char* filename) {
 
     return loaded_texture;
 }
+
+void rm_free_texture(Texture tex) {
+    glDeleteTextures(1, &tex.texture_id);
+}
