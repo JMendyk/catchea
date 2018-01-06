@@ -7,5 +7,11 @@ target_sources(${EXECUTABLE_NAME}
     PRIVATE
         ${SRC_DIR}/main.cpp
 
+        ${SRC_DIR}/app.cpp
+
+        ${SRC_DIR}/gui/menu_widget.cpp
+        ${SRC_DIR}/gui/control_widget.cpp
+        ${SRC_DIR}/gui/footer_widget.cpp
+
         ${SRC_DIR}/geotile.cpp
 )
