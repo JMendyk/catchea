@@ -6,4 +6,6 @@ target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SRC_DIR})
 target_sources(${EXECUTABLE_NAME}
     PRIVATE
         ${SRC_DIR}/main.cpp
+
+        ${SRC_DIR}/geotile.cpp
 )
