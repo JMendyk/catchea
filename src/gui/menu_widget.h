@@ -18,6 +18,7 @@ typedef struct {
 /**
  * Create new MenuWidget instance
  * @return NULL if memory allocation was impossible, otherwise a valid pointer to MenuWidget
+ * @memberof MenuWidget
  */
 MenuWidget* MenuWidget__create();
 
@@ -26,6 +27,7 @@ MenuWidget* MenuWidget__create();
  * @remark Should only be called by App
  * @param mw MenuWidget to be initialized
  * @return true if initialization was successful
+ * @memberof MenuWidget
  */
 bool MenuWidget__init(MenuWidget* mw);
 
@@ -34,6 +36,7 @@ bool MenuWidget__init(MenuWidget* mw);
  * @param mw MenuWidget to be rendered
  * @param [in] window_pos position of MenuWidget window
  * @param [in] window_size size of MenuWidget window
+ * @memberof MenuWidget
  */
 void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& window_size);
 
@@ -42,12 +45,14 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
  * @remark Should only be called by App
  * @param mw MenuWidget to be terminated
  * @return true if termination was successful
+ * @memberof MenuWidget
  */
 bool MenuWidget__terminate(MenuWidget* mw);
 
 /**
  * Destroy MenuWidget
  * @param [in] mw MenuWidget to be destroyed
+ * @memberof MenuWidget
  */
 void MenuWidget__destroy(MenuWidget* mw);
 

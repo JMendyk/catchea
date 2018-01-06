@@ -33,6 +33,7 @@ typedef struct {
 /**
  * Create new App instance
  * @return NULL if memory allocation was impossible, otherwise a valid pointer to App
+ * @memberof App
  */
 App* App__create();
 
@@ -40,18 +41,21 @@ App* App__create();
  * Initialize application
  * @param app App to be initialized
  * @return true if initialization was successful
+ * @memberof App
  */
 bool App__init(App* app);
 
 /**
  * Start application
  * @param app App to be started
+ * @memberof App
  */
 void App__run(App* app);
 
 /**
  * Render application
  * @param app App to be rendered
+ * @memberof App
  */
 void App__render(App* app);
 
@@ -59,12 +63,14 @@ void App__render(App* app);
  * Terminate application
  * @param app App to be terminated
  * @return true if termination was successful
+ * @memberof App
  */
 bool App__terminate(App* app);
 
 /**
  * Destroy application
  * @param [in] app App to be destroyed
+ * @memberof App
  */
 void App__destroy(App* app);
 

@@ -18,6 +18,7 @@ typedef struct {
 /**
  * Create new ControlWidget instance
  * @return NULL if memory allocation was impossible, otherwise a valid pointer to ControlWidget
+ * @memberof ControlWidget
  */
 ControlWidget* ControlWidget__create();
 
@@ -26,6 +27,7 @@ ControlWidget* ControlWidget__create();
  * @remark Should only be called by App
  * @param cw ControlWidget to be initialized
  * @return true if initialization was successful
+ * @memberof ControlWidget
  */
 bool ControlWidget__init(ControlWidget* cw);
 
@@ -34,6 +36,7 @@ bool ControlWidget__init(ControlWidget* cw);
  * @param cw ControlWidget to be rendered
  * @param [in] window_pos position of ControlWidget window
  * @param [in] window_size size of ControlWidget window
+ * @memberof ControlWidget
  */
 void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const ImVec2& window_size);
 
@@ -42,12 +45,14 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
  * @remark Should only be called by App
  * @param cw ControlWidget to be terminated
  * @return true if termination was successful
+ * @memberof ControlWidget
  */
 bool ControlWidget__terminate(ControlWidget* cw);
 
 /**
  * Destroy ControlWidget
  * @param [in] cw ControlWidget to be destroyed
+ * @memberof ControlWidget
  */
 void ControlWidget__destroy(ControlWidget* cw);
 
