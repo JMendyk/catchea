@@ -14,4 +14,6 @@ target_sources(${EXECUTABLE_NAME}
         ${SRC_DIR}/gui/footer_widget.cpp
 
         ${SRC_DIR}/geotile.cpp
+
+        ${SRC_DIR}/resource_manager.cpp
 )

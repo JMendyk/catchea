@@ -12,3 +12,6 @@ add_executable(${EXECUTABLE_NAME} "")
 include(deps/CMakeLists.txt)
 
 include(src/CMakeLists.txt)
+
+set(RES_DIR ${CMAKE_SOURCE_DIR}/res)
+file(COPY ${RES_DIR} DESTINATION ${CMAKE_BINARY_DIR})
