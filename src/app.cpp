@@ -49,6 +49,17 @@ bool App__init(App* app) {
     // Setup ImGui binding
     ImGui_ImplGlfwGL3_Init(app->window, true);
 
+    /*
+         * Add default app font
+         * This must happen before initialization of any other app components
+         * since default app font must be defined as the first one.
+         */
+    ImGuiIO& io = ImGui::GetIO();
+    static ImFontConfig defaultFontConfig = ImFontConfig();
+    io.Fonts->AddFontFromFileTTF("res/fonts/Roboto-Medium.ttf", 15.0f, &defaultFontConfig);
+
+    ImGui::GetStyle().WindowRounding = 0.0f;
+
     if(!MenuWidget__init(app->menuWidget))
         return false;
 
@@ -90,6 +101,52 @@ void App__run(App* app) {
 }
 
 void App__render(App* app) {
+    int canvas_w, canvas_h;
+    glfwGetFramebufferSize(app->window, &canvas_w, &canvas_h);
+
+    static int ui_margin = 16;
+    static int menu_widget_height = 64;
+    static int footer_widget_height = 32;
+    static int control_widget_width = 300;
+
+    /*
+     * Menu Widget
+     */
+    const ImVec2 menu_widget_pos = ImVec2(
+        ui_margin,
+        ui_margin
+    );
+    const ImVec2 menu_widget_size = ImVec2(
+        canvas_w - 2*ui_margin - control_widget_width - ui_margin,
+        menu_widget_height
+    );
+    MenuWidget__render(app->menuWidget, menu_widget_pos, menu_widget_size);
+
+    /*
+     * Control Widget
+     */
+    const ImVec2 control_widget_pos = ImVec2(
+        canvas_w - ui_margin - control_widget_width,
+        ui_margin
+    );
+    const ImVec2 control_widget_size = ImVec2(
+        control_widget_width,
+        canvas_h - (ui_margin + footer_widget_height + ui_margin)
+    );
+    ControlWidget__render(app->controlWidget, control_widget_pos, control_widget_size);
+
+    /*
+     * Footer Widget
+     */
+    const ImVec2 footer_widget_pos = ImVec2(
+        0,
+        canvas_h - (footer_widget_height)
+    );
+    const ImVec2 footer_widget_size = ImVec2(
+        canvas_w,
+        footer_widget_height
+    );
+    FooterWidget__render(app->footerWidget, footer_widget_pos, footer_widget_size);
 
 }
 
