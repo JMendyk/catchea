@@ -16,6 +16,10 @@ App* App__create() {
     if(!app->menuWidget)
         return NULL;
 
+    app->mapWidget = MapWidget__create();
+    if(!app->mapWidget)
+        return NULL;
+
     app->controlWidget = ControlWidget__create();
     if(!app->controlWidget)
         return NULL;
@@ -61,6 +65,9 @@ bool App__init(App* app) {
     ImGui::GetStyle().WindowRounding = 0.0f;
 
     if(!MenuWidget__init(app->menuWidget))
+        return false;
+
+    if(!MapWidget__init(app->mapWidget))
         return false;
 
     if(!ControlWidget__init(app->controlWidget))
@@ -123,6 +130,19 @@ void App__render(App* app) {
     MenuWidget__render(app->menuWidget, menu_widget_pos, menu_widget_size);
 
     /*
+     * Menu Widget
+     */
+    const ImVec2 map_widget_pos = ImVec2(
+        ui_margin,
+        ui_margin + menu_widget_height + ui_margin
+    );
+    const ImVec2 map_widget_size = ImVec2(
+        canvas_w - 2*ui_margin - control_widget_width - ui_margin,
+        canvas_h - (ui_margin + menu_widget_height + ui_margin + 0 + ui_margin + footer_widget_height)
+    );
+    MapWidget__render(app->mapWidget, map_widget_pos, map_widget_size);
+
+    /*
      * Control Widget
      */
     const ImVec2 control_widget_pos = ImVec2(
@@ -154,6 +174,9 @@ bool App__terminate(App* app) {
     if(!MenuWidget__terminate(app->menuWidget))
         return false;
 
+    if(!MapWidget__terminate(app->mapWidget))
+        return false;
+
     if(!ControlWidget__terminate(app->controlWidget))
         return false;
 
@@ -168,6 +191,7 @@ bool App__terminate(App* app) {
 
 void App__destroy(App* app) {
     MenuWidget__destroy(app->menuWidget);
+    MapWidget__destroy(app->mapWidget);
     ControlWidget__destroy(app->controlWidget);
     FooterWidget__destroy(app->footerWidget);
 
