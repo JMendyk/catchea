@@ -4,6 +4,7 @@
  * @date 05.01.18
  */
 
+#include <cstdio>
 #include "geo_tile.h"
 
 
@@ -21,27 +22,49 @@ GeoTile* GeoTile__create(geo_cord_t lat, geo_cord_t lon, geo_cord_t lat_size, ge
     return tile;
 }
 
-bool GeoTile__set_data(GeoTile *tile, geo_sample_dim_t height, geo_sample_dim_t width, geo_sample_t* data) {
-    GeoTile__clear_data(tile);
+bool GeoTile__data_set(GeoTile *tile, geo_sample_dim_t height, geo_sample_dim_t width, geo_sample_t *data) {
+    if(tile->width != width || tile->height != height) {
+        GeoTile__data_clear(tile);
+        if(!GeoTile__data_alloc(tile, height, width)) {
+            return false;
+        }
+    }
 
-    tile->data = (geo_sample_t*) calloc(height * width, sizeof(geo_sample_t));
-    if(!tile->data)
-        return false;
-
-    tile->height = height;
-    tile->width = width;
     memcpy(tile->data, data, height * width * sizeof(geo_sample_t));
 
     return true;
 }
 
-void GeoTile__clear_data(GeoTile *tile) {
+bool GeoTile__data_alloc(GeoTile *tile, geo_sample_dim_t height, geo_sample_dim_t width) {
+    tile->data = (geo_sample_t*) calloc(height * width, sizeof(geo_sample_t));
+    tile->height = height;
+    tile->width = width;
+
+    return tile->data != NULL;
+}
+
+void GeoTile__data_place(
+    GeoTile *tile,
+    geo_sample_dim_t height, geo_sample_dim_t width, geo_sample_t *data,
+    geo_sample_dim_t place_y, geo_sample_dim_t place_x
+) {
+    geo_sample_dim_t tile_offset = place_y * tile->width + place_x;
+    geo_sample_dim_t data_offset = 0;
+
+    for(geo_sample_dim_t v_pos = 0; v_pos < height; v_pos++) {
+        memcpy(tile->data + tile_offset, data + data_offset, width * sizeof(geo_sample_t));
+        tile_offset += tile->width;
+        data_offset += width;
+    }
+}
+
+void GeoTile__data_clear(GeoTile *tile) {
     if(tile->data)
         free(tile->data);
 }
 
 void GeoTile__destroy(GeoTile* tile) {
-    GeoTile__clear_data(tile);
+    GeoTile__data_clear(tile);
     free(tile);
 }
 
@@ -63,7 +86,7 @@ bool GeoTile__is_next_lat(const GeoTile *first, const GeoTile *next) {
 bool GeoTile__is_next_lon(const GeoTile *first, const GeoTile *next) {
     return first->lon + first->lon_size == next->lon
         && first->lat == next->lat
-        && first->lat_size == next->lat;
+        && first->lat_size == next->lat_size;
 }
 
 GeoTile* GeoTile__merge(const GeoTile* first, const GeoTile* second) {
@@ -87,7 +110,8 @@ GeoTile* GeoTile__merge(const GeoTile* first, const GeoTile* second) {
         offset += first->height * first->width;
 
         assert(offset == height * width);
-        GeoTile__set_data(merged, height, width, data);
+        GeoTile__data_set(merged, height, width, data);
+        free(data);
     } else if(GeoTile__is_next_lon(first, second)) {
         merged = GeoTile__create(first->lat, first->lon, first->lat_size, first->lon_size + second->lon_size);
         if(!merged) return merged;
@@ -107,7 +131,8 @@ GeoTile* GeoTile__merge(const GeoTile* first, const GeoTile* second) {
         }
 
         assert(offset == height * width);
-        GeoTile__set_data(merged, height, width, data);
+        GeoTile__data_set(merged, height, width, data);
+        free(data);
     }
 
     return merged;

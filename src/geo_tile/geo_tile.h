@@ -12,7 +12,7 @@
 #include <string.h>
 #include <assert.h>
 
-typedef unsigned short geo_cord_t;
+typedef   signed short geo_cord_t;
 typedef   signed short geo_sample_t;
 typedef unsigned  long geo_sample_dim_t;
 
@@ -59,13 +59,38 @@ GeoTile* GeoTile__create(geo_cord_t lat, geo_cord_t lon, geo_cord_t lat_size, ge
  * @param [in] data geographic data
  * @return false if allocation of new memory failed, true if operation was successful
  */
-bool GeoTile__set_data(GeoTile *tile, geo_sample_dim_t height, geo_sample_dim_t width, geo_sample_t* data);
+bool GeoTile__data_set(GeoTile *tile, geo_sample_dim_t height, geo_sample_dim_t width, geo_sample_t *data);
+
+/**
+ * Allocate memory for GeoTile's data but don't set it yet
+ * Data can be set in future using GeoTile__place_data
+ * @param [out] tile GeoTile on which set operation should be performed
+ * @param [in] height future data's height
+ * @param [in] width future data's height
+ * @return false if allocation of new memory failed, true if operation was successful
+ */
+bool GeoTile__data_alloc(GeoTile *tile, geo_sample_dim_t height, geo_sample_dim_t width);
+
+/**
+ * Copy data to GeoTile's data at a given place
+ * @param [out] tile
+ * @param [in] height data's height
+ * @param [in] width data's width
+ * @param [in] data data to be place
+ * @param [in] place_y where to place data in GeoTile
+ * @param [in] place_x where to place data in GeoTile
+ */
+void GeoTile__data_place(
+    GeoTile *tile,
+    geo_sample_dim_t height, geo_sample_dim_t width, geo_sample_t *data,
+    geo_sample_dim_t place_y, geo_sample_dim_t place_x
+);
 
 /**
  * Frees data of GeoTile
  * @param [out] tile
  */
-void GeoTile__clear_data(GeoTile *tile);
+void GeoTile__data_clear(GeoTile *tile);
 
 /**
  * Destroy GeoTile
