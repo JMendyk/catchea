@@ -10,8 +10,13 @@
 #include <stdlib.h>
 
 #include <imgui.h>
+#include <imgui_internal.h>
+
+#include "resource_manager.h"
 
 typedef struct {
+
+    Texture btn_tex_open, btn_tex_tile, btn_tex_topo, btn_tex_catch;
 
 } MenuWidget;
 
