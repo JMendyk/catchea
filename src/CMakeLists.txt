@@ -14,6 +14,7 @@ target_sources(${EXECUTABLE_NAME}
         ${SRC_DIR}/gui/footer_widget.cpp
 
         ${SRC_DIR}/geo_tile/geo_tile.cpp
+        ${SRC_DIR}/dis_tile/dis_tile.cpp
 
         ${SRC_DIR}/resource_manager.cpp
         ${SRC_DIR}/utils.cpp
