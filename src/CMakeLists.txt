@@ -16,4 +16,5 @@ target_sources(${EXECUTABLE_NAME}
         ${SRC_DIR}/geo_tile/geo_tile.cpp
 
         ${SRC_DIR}/resource_manager.cpp
+        ${SRC_DIR}/utils.cpp
 )
