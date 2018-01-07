@@ -18,7 +18,7 @@
  */
 typedef struct {
     GLuint texture_id;
-    int widget, height;
+    int width, height;
 } Texture;
 
 /**
@@ -28,6 +28,17 @@ typedef struct {
  * @memberof Texture
  */
 Texture rm_load_texture(const char* filename);
+
+/**
+ * Load texture from memory buffer and register in OpenGL
+ * @param [in] data memory buffer to register
+ * @param [in] width buffer's width
+ * @param [in] height buffer's height
+ * @param [in] channels_count number of color channels (ex. RGB = 3, RGBA = 4)
+ * @return loaded texture
+ * @memberof Texture
+ */
+Texture rm_texture_from_memory(const void* data, int width, int height, int channels_count);
 
 /**
  * Free texture from OpenGL
