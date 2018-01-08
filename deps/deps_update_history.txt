@@ -9,3 +9,14 @@ Dependency: stb_image
 555efbe, Sun Jul 23 14:09:39 2017 -0700 : Update version numbers
 ------------------------------------------------------
 
+Updating dependencies - Mon Jan 08 17:01:42 2018 +0100
+Dependency: gl3w
+8f7f459, Thu Dec 14 14:01:25 2017 +0200 : dlopen with RTLD_LOCAL.
+Dependency: glfw
+999f355, Wed Aug 17 16:48:22 2016 +0200 : Documentation work
+Dependency: imgui + addons
+cd03433, Fri Jan 5 14:30:35 2018 +0100 : addons/imguifilesystem/imguifilesystem.cpp: Manually merged issue 38. Fixes https://github.com/Flix01/imgui/issues/38.
+Dependency: stb_image
+555efbe, Sun Jul 23 14:09:39 2017 -0700 : Update version numbers
+------------------------------------------------------
+

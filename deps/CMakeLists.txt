@@ -30,6 +30,9 @@ target_link_libraries(${EXECUTABLE_NAME} glfw)
 ##### ImGUI #####
 set(IMGUI_DIR ${DEPS_DIR}/imgui)
 
+# Tells ImGUI to include user addons, such as imguifilesystem
+target_compile_definitions(${EXECUTABLE_NAME} PRIVATE IMGUI_INCLUDE_IMGUI_USER_H IMGUI_INCLUDE_IMGUI_USER_INL)
+
 target_include_directories(${EXECUTABLE_NAME} PRIVATE ${IMGUI_DIR})
 target_sources(${EXECUTABLE_NAME}
     PRIVATE
