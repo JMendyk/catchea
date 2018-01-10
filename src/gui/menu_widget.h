@@ -18,6 +18,8 @@ typedef struct {
 
     Texture btn_tex_open, btn_tex_tile, btn_tex_topo, btn_tex_catch;
 
+    void* app;
+
 } MenuWidget;
 
 /**
@@ -31,10 +33,11 @@ MenuWidget* MenuWidget__create();
  * Initialize MenuWidget at the start of the application
  * @remark Should only be called by App
  * @param mw MenuWidget to be initialized
+ * @param app
  * @return true if initialization was successful
  * @memberof MenuWidget
  */
-bool MenuWidget__init(MenuWidget* mw);
+bool MenuWidget__init(MenuWidget* mw, void* app);
 
 /**
  * Render MenuWidget

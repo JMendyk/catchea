@@ -17,7 +17,7 @@ FooterWidget* FooterWidget__create() {
     return fw;
 }
 
-bool FooterWidget__init(FooterWidget* fw) {
+bool FooterWidget__init(FooterWidget* fw, void* app) {
     return true;
 }
 

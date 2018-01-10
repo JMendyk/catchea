@@ -6,7 +6,7 @@
 
 #include "app.h"
 
-
+#include "dis_interpreters/topographer.h"
 
 App* App__create() {
     App* app = (App*) malloc(sizeof(App));
@@ -64,16 +64,16 @@ bool App__init(App* app) {
 
     ImGui::GetStyle().WindowRounding = 0.0f;
 
-    if(!MenuWidget__init(app->menuWidget))
+    if(!MenuWidget__init(app->menuWidget, app))
         return false;
 
-    if(!MapWidget__init(app->mapWidget))
+    if(!MapWidget__init(app->mapWidget, app))
         return false;
 
-    if(!ControlWidget__init(app->controlWidget))
+    if(!ControlWidget__init(app->controlWidget, app))
         return false;
 
-    if(!FooterWidget__init(app->footerWidget))
+    if(!FooterWidget__init(app->footerWidget, app))
         return false;
 
     return true;
@@ -168,6 +168,12 @@ void App__render(App* app) {
     );
     FooterWidget__render(app->footerWidget, footer_widget_pos, footer_widget_size);
 
+}
+
+void App_file_open_request(App* app, const char* filename) {
+    app->geoTile = GeoTile__from_hgt_file(filename);
+
+    MapWidget__update_tile(app->mapWidget);
 }
 
 bool App__terminate(App* app) {

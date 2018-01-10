@@ -27,6 +27,9 @@ typedef struct {
 
     GLFWwindow* window;
 
+    GeoTile* geoTile;
+    DisTile* disTile;
+
     MenuWidget* menuWidget;
     MapWidget* mapWidget;
     ControlWidget* controlWidget;
@@ -61,6 +64,13 @@ void App__run(App* app);
  * @memberof App
  */
 void App__render(App* app);
+
+/**
+ * Handle request from MenuWidget to open file
+ * @param app App to receive request
+ * @param filename file's path
+ */
+void App_file_open_request(App* app, const char* filename);
 
 /**
  * Terminate application

@@ -5,8 +5,14 @@
  */
 
 #include <math.h>
+#include <cstdio>
+#include "app.h"
 
 #include "map_widget.h"
+#include "dis_interpreters/topographer.h"
+
+
+
 
 MapWidget* MapWidget__create() {
     MapWidget* mw = (MapWidget*) malloc(sizeof(MapWidget));
@@ -15,36 +21,27 @@ MapWidget* MapWidget__create() {
     return mw;
 }
 
-unsigned char clamp(signed short s) {
-    if(s > 255) s = 255;
-    if(s < 0) s = 0;
-    return (unsigned char) s;
-}
+bool MapWidget__init(MapWidget* mw, void* app) {
+    mw->app = app;
+    mw->is_color = 0;
 
-bool MapWidget__init(MapWidget* mw) {
-    mw->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
+    START_BENCH(map_load)
 
-    if(!mw->geoTile)
+    //START_BENCH(to_geo_tile)
+    ((App*)app)->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
+
+    if(!((App*)app)->geoTile)
         return false;
 
-    mw->disTile = DisTile__create(mw->geoTile);
-    if(!mw->disTile)
-        return false;
+    //STOP_BENCH(to_geo_tile)
 
-    {
-        DisTileSample* dis_data = (DisTileSample*) calloc(mw->disTile->tile->height * mw->disTile->tile->width, sizeof(DisTileSample));
+    //fprintf(stderr, "Loading to GeoTile: %.2lf\n", GET_BENCH(to_geo_tile));
 
-        for(size_t it = 0; it <= (mw->disTile->tile->height * mw->disTile->tile->width); it ++) {
-            dis_data[it].red = clamp(mw->geoTile->data[it]);
-            dis_data[it].green = clamp(mw->geoTile->data[it]);
-            dis_data[it].blue = clamp(mw->geoTile->data[it]);
-            dis_data[it].alpha = 255;
-        }
+    MapWidget__update_tile(mw);
 
-        DisTile__set_data(mw->disTile, dis_data);
-    }
+    STOP_BENCH(map_load)
 
-    mw->texTile = DisTile__to_texture(mw->disTile);
+    fprintf(stderr, "Total load time: %.2lf\n", GET_BENCH(map_load));
 
     return true;
 }
@@ -132,11 +129,16 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
     ImGui::PopStyleVar(2);
 }
 
+void MapWidget__update_tile(MapWidget* mw) {
+    ((App*)mw->app)->disTile = Topographer__interpret(((App*)mw->app)->geoTile, mw->is_color);
+    mw->texTile = DisTile__to_texture(((App*)mw->app)->disTile);
+}
+
 bool MapWidget__terminate(MapWidget* mw) {
     rm_free_texture(mw->texTile);
 
-    DisTile__destroy(mw->disTile);
-    GeoTile__destroy(mw->geoTile);
+    DisTile__destroy(((App*)mw->app)->disTile);
+    GeoTile__destroy(((App*)mw->app)->geoTile);
 
     return true;
 }

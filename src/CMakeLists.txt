@@ -19,6 +19,8 @@ target_sources(${EXECUTABLE_NAME}
 
         ${SRC_DIR}/dis_tile/dis_tile.cpp
 
+        ${SRC_DIR}/dis_interpreters/topographer.cpp
+
         ${SRC_DIR}/resource_manager.cpp
         ${SRC_DIR}/utils.cpp
 )

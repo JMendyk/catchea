@@ -12,15 +12,18 @@
 #include <imgui.h>
 
 #include "resource_manager.h"
+
 #include "geo_tile/geo_tile.h"
 #include "geo_tile/geo_tile_hgt_plugin.h"
 #include "dis_tile/dis_tile.h"
 
 typedef struct {
 
-    GeoTile* geoTile;
-    DisTile* disTile;
     Texture texTile;
+
+    int is_color;
+
+    void* app;
 
 } MapWidget;
 
@@ -35,10 +38,11 @@ MapWidget* MapWidget__create();
  * Initialize MapWidget at the start of the application
  * @remark Should only be called by App
  * @param mw MapWidget to be initialized
+ * @param app
  * @return true if initialization was successful
  * @memberof MapWidget
  */
-bool MapWidget__init(MapWidget* mw);
+bool MapWidget__init(MapWidget* mw, void* app);
 
 /**
  * Render MapWidget
@@ -48,6 +52,12 @@ bool MapWidget__init(MapWidget* mw);
  * @memberof MapWidget
  */
 void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& window_size);
+
+/**
+ * Update information regarding loaded tile
+ * @param mw MapWidget to receive signal
+ */
+void MapWidget__update_tile(MapWidget* mw);
 
 /**
  * Terminate MapWidget before the application terminates

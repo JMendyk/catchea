@@ -13,6 +13,8 @@
 
 typedef struct {
 
+    void* app;
+
 } ControlWidget;
 
 /**
@@ -26,10 +28,11 @@ ControlWidget* ControlWidget__create();
  * Initialize ControlWidget at the start of the application
  * @remark Should only be called by App
  * @param cw ControlWidget to be initialized
+ * @param app
  * @return true if initialization was successful
  * @memberof ControlWidget
  */
-bool ControlWidget__init(ControlWidget* cw);
+bool ControlWidget__init(ControlWidget* cw, void* app);
 
 /**
  * Render ControlWidget

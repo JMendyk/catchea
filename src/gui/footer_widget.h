@@ -13,6 +13,8 @@
 
 typedef struct {
 
+    void* app;
+
 } FooterWidget;
 
 /**
@@ -26,10 +28,11 @@ FooterWidget* FooterWidget__create();
  * Initialize FooterWidget at the start of the application
  * @remark Should only be called by App
  * @param fw FooterWidget to be initialized
+ * @param app
  * @return true if initialization was successful
  * @memberof FooterWidget
  */
-bool FooterWidget__init(FooterWidget* fw);
+bool FooterWidget__init(FooterWidget* fw, void* app);
 
 /**
  * Render FooterWidget
