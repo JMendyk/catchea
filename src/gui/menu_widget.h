@@ -14,11 +14,13 @@
 
 #include "resource_manager.h"
 
+struct App;
+
 typedef struct {
 
     Texture btn_tex_open, btn_tex_tile, btn_tex_topo, btn_tex_catch;
 
-    void* app;
+    App* app;
 
 } MenuWidget;
 
@@ -37,7 +39,7 @@ MenuWidget* MenuWidget__create();
  * @return true if initialization was successful
  * @memberof MenuWidget
  */
-bool MenuWidget__init(MenuWidget* mw, void* app);
+bool MenuWidget__init(MenuWidget* mw, App* app);
 
 /**
  * Render MenuWidget

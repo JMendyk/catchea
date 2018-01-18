@@ -17,13 +17,15 @@
 #include "geo_tile/geo_tile_hgt_plugin.h"
 #include "dis_tile/dis_tile.h"
 
+struct App;
+
 typedef struct {
 
     Texture texTile;
 
     int is_color;
 
-    void* app;
+    App* app;
 
 } MapWidget;
 
@@ -42,7 +44,7 @@ MapWidget* MapWidget__create();
  * @return true if initialization was successful
  * @memberof MapWidget
  */
-bool MapWidget__init(MapWidget* mw, void* app);
+bool MapWidget__init(MapWidget* mw, App* app);
 
 /**
  * Render MapWidget

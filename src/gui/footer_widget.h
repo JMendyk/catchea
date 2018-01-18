@@ -11,9 +11,11 @@
 
 #include <imgui.h>
 
+struct App;
+
 typedef struct {
 
-    void* app;
+    App* app;
 
 } FooterWidget;
 
@@ -32,7 +34,7 @@ FooterWidget* FooterWidget__create();
  * @return true if initialization was successful
  * @memberof FooterWidget
  */
-bool FooterWidget__init(FooterWidget* fw, void* app);
+bool FooterWidget__init(FooterWidget* fw, App* app);
 
 /**
  * Render FooterWidget

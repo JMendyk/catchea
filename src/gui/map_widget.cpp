@@ -21,16 +21,16 @@ MapWidget* MapWidget__create() {
     return mw;
 }
 
-bool MapWidget__init(MapWidget* mw, void* app) {
+bool MapWidget__init(MapWidget* mw, App* app) {
     mw->app = app;
     mw->is_color = 0;
 
     START_BENCH(map_load)
 
     //START_BENCH(to_geo_tile)
-    ((App*)app)->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
+    app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
 
-    if(!((App*)app)->geoTile)
+    if(!app->geoTile)
         return false;
 
     //STOP_BENCH(to_geo_tile)
@@ -130,15 +130,15 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 }
 
 void MapWidget__update_tile(MapWidget* mw) {
-    ((App*)mw->app)->disTile = Topographer__interpret(((App*)mw->app)->geoTile, mw->is_color);
-    mw->texTile = DisTile__to_texture(((App*)mw->app)->disTile);
+    mw->app->disTile = Topographer__interpret(mw->app->geoTile, mw->is_color);
+    mw->texTile = DisTile__to_texture(mw->app->disTile);
 }
 
 bool MapWidget__terminate(MapWidget* mw) {
     rm_free_texture(mw->texTile);
 
-    DisTile__destroy(((App*)mw->app)->disTile);
-    GeoTile__destroy(((App*)mw->app)->geoTile);
+    DisTile__destroy(mw->app->disTile);
+    GeoTile__destroy(mw->app->geoTile);
 
     return true;
 }

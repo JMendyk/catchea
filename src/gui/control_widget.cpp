@@ -15,7 +15,7 @@ ControlWidget* ControlWidget__create() {
     return cw;
 }
 
-bool ControlWidget__init(ControlWidget* cw, void* app) {
+bool ControlWidget__init(ControlWidget* cw, App* app) {
     return true;
 }
 

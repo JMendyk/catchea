@@ -23,7 +23,7 @@
 
 #define APP_NAME "Catchea"
 
-typedef struct {
+struct App {
 
     GLFWwindow* window;
 
@@ -34,7 +34,7 @@ typedef struct {
     MapWidget* mapWidget;
     ControlWidget* controlWidget;
     FooterWidget* footerWidget;
-} App;
+};
 
 /**
  * Create new App instance

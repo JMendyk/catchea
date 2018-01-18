@@ -11,9 +11,11 @@
 
 #include <imgui.h>
 
+struct App;
+
 typedef struct {
 
-    void* app;
+    App* app;
 
 } ControlWidget;
 
@@ -32,7 +34,7 @@ ControlWidget* ControlWidget__create();
  * @return true if initialization was successful
  * @memberof ControlWidget
  */
-bool ControlWidget__init(ControlWidget* cw, void* app);
+bool ControlWidget__init(ControlWidget* cw, App* app);
 
 /**
  * Render ControlWidget

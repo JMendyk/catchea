@@ -17,7 +17,7 @@ MenuWidget* MenuWidget__create() {
     return mw;
 }
 
-bool MenuWidget__init(MenuWidget* mw, void* app) {
+bool MenuWidget__init(MenuWidget* mw, struct App* app) {
     mw->app = app;
     mw->btn_tex_open = rm_load_texture("res/assets/ic_folder_open_black_48dp.png");
     mw->btn_tex_tile = rm_load_texture("res/assets/ic_border_outer_black_48dp.png");
@@ -47,7 +47,7 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
         const char* filename = dlg.chooseFileDialog(btn_open, NULL, ".hgt");
         if(strlen(filename) > 0) {
             fprintf(stderr, "File picked: %s\n", filename);
-            App_file_open_request((App*)mw->app, filename);
+            App_file_open_request(mw->app, filename);
         }
 
         ImGui::SameLine();
@@ -60,8 +60,8 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
         ImGui::SameLine();
 
         if(ImGui::ImageButton((ImTextureID)mw->btn_tex_topo.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0)) {
-            ((App*)mw->app)->mapWidget->is_color = 1 - ((App*)mw->app)->mapWidget->is_color;
-            MapWidget__update_tile(((App*)mw->app)->mapWidget);
+            (mw->app)->mapWidget->is_color = 1 - (mw->app)->mapWidget->is_color;
+            MapWidget__update_tile((mw->app)->mapWidget);
         }
         ImGui::SameLine();
 
