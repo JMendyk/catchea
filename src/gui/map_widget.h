@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include <imgui.h>
+#include <vector>
 
 #include "resource_manager.h"
 
@@ -19,7 +20,7 @@
 
 struct App;
 
-typedef struct {
+struct MapWidget {
 
     Texture texTile;
 
@@ -27,7 +28,7 @@ typedef struct {
 
     App* app;
 
-} MapWidget;
+};
 
 /**
  * Create new MapWidget instance
@@ -60,6 +61,9 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
  * @param mw MapWidget to receive signal
  */
 void MapWidget__update_tile(MapWidget* mw);
+
+void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
+                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
 
 /**
  * Terminate MapWidget before the application terminates

@@ -6,6 +6,14 @@
 
 #include "app.h"
 
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
+
+#include "gui/menu_widget.h"
+#include "gui/map_widget.h"
+#include "gui/control_widget.h"
+#include "gui/footer_widget.h"
+
 #include "dis_interpreters/topographer.h"
 
 App* App__create() {

@@ -29,13 +29,13 @@ typedef unsigned  long geo_sample_dim_t;
  * if you merge horizontally (along longitude axis) two tiles (f and s), the resulting
  * tile will have a with of f.width + s.width - 1.
  */
-typedef struct {
+struct GeoTile {
     geo_cord_t lat, lon;
     geo_cord_t lat_size, lon_size;
 
     geo_sample_dim_t height, width;
     geo_sample_t* data;
-} GeoTile;
+};
 
 
 

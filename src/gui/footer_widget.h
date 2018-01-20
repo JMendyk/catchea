@@ -13,11 +13,11 @@
 
 struct App;
 
-typedef struct {
+struct FooterWidget {
 
-    App* app;
+    App *app;
 
-} FooterWidget;
+};
 
 /**
  * Create new FooterWidget instance

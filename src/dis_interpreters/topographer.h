@@ -7,6 +7,9 @@
 #ifndef CATCHEA_TOPOGRAPHER_H
 #define CATCHEA_TOPOGRAPHER_H
 
+
+#include <vector>
+
 #include <dis_tile/dis_tile.h>
 
 
@@ -14,6 +17,9 @@
 DisTile* Topographer__interpret_grayscale(GeoTile* geo_tile);
 
 DisTile* Topographer__interpret_color(GeoTile* geo_tile);
+
+DisTile* Topographer__interpret_param(GeoTile* geo_tile, const DisTileSample& lower, const DisTileSample& upper,
+                                      const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
 
 DisTile* Topographer__interpret(GeoTile* geo_tile, int is_color);
 

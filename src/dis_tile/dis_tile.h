@@ -22,10 +22,10 @@ typedef struct {
  * and thus is easy to convert to texture which, for example, can be loaded to OpenGL
  * and displayed on screen.
  */
-typedef struct {
+struct DisTile {
     GeoTile* tile;
     DisTileSample* data;
-} DisTile;
+};
 
 
 

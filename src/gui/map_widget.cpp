@@ -6,6 +6,8 @@
 
 #include <math.h>
 #include <cstdio>
+#include <dis_interpreters/catchmenter.h>
+#include <resource_manager.h>
 #include "app.h"
 
 #include "map_widget.h"
@@ -28,7 +30,12 @@ bool MapWidget__init(MapWidget* mw, App* app) {
     START_BENCH(map_load)
 
     //START_BENCH(to_geo_tile)
-    app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
+    //app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
+
+    int lat = rand() % (54-49+1) + 49;
+    int lon = rand() % (23-14+1) + 14;
+
+    app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", lat, lon, lat, lon);
 
     if(!app->geoTile)
         return false;
@@ -37,7 +44,12 @@ bool MapWidget__init(MapWidget* mw, App* app) {
 
     //fprintf(stderr, "Loading to GeoTile: %.2lf\n", GET_BENCH(to_geo_tile));
 
-    MapWidget__update_tile(mw);
+    MapWidget__update_tile(mw, { 000, 000, 000, 255 }, { 255, 000, 000, 255 }, {
+        //std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32768),
+        //std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32767),
+        std::make_pair((DisTileSample){ 000, 000, 000, 255 },      0),
+        std::make_pair((DisTileSample){ 255, 255, 255, 255 },   2000)
+    });
 
     STOP_BENCH(map_load)
 
@@ -114,6 +126,26 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
         ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
 
+        //static ImVec2 cord = ImVec2(2, 2);
+
+        if(ImGui::IsMouseDown(0)) {
+            // Updates existing DisTile instead of creating new one
+            ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
+
+
+            rm_free_texture(mw->texTile);
+
+            cord.x = cord.x / image_size.x * mw->texTile.width;
+            cord.y = cord.y / image_size.y * mw->texTile.height;
+
+            Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, static_cast<int>(cord.x),
+                                                        static_cast<int>(cord.y));
+            mw->texTile = DisTile__to_texture(mw->app->disTile);
+        }
+
+        //ImGui::SetCursorPos(cord);
+        //ImGui::Button("Label");
+
 
         //ImU32 GRID_COLOR = ImColor(200, 200, 200, 40);
         //
@@ -130,7 +162,22 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 }
 
 void MapWidget__update_tile(MapWidget* mw) {
+    if(mw->app->disTile != NULL) {
+        rm_free_texture(mw->texTile);
+        DisTile__destroy(mw->app->disTile);
+    }
     mw->app->disTile = Topographer__interpret(mw->app->geoTile, mw->is_color);
+    mw->texTile = DisTile__to_texture(mw->app->disTile);
+}
+
+void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
+                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps) {
+    if(mw->app->disTile != NULL) {
+        rm_free_texture(mw->texTile);
+        DisTile__destroy(mw->app->disTile);
+    }
+
+    mw->app->disTile = Topographer__interpret_param(mw->app->geoTile, lower, upper, steps);
     mw->texTile = DisTile__to_texture(mw->app->disTile);
 }
 

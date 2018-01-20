@@ -10,16 +10,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/gl3w.h>
-#include <GLFW/glfw3.h>
+struct GLFWwindow;
 
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
 
-#include "gui/menu_widget.h"
-#include "gui/map_widget.h"
-#include "gui/control_widget.h"
-#include "gui/footer_widget.h"
+struct GeoTile;
+struct DisTile;
+
+struct MenuWidget;
+struct MapWidget;
+struct ControlWidget;
+struct FooterWidget;
 
 #define APP_NAME "Catchea"
 

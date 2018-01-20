@@ -13,11 +13,11 @@
 
 struct App;
 
-typedef struct {
+struct ControlWidget {
 
     App* app;
 
-} ControlWidget;
+};
 
 /**
  * Create new ControlWidget instance

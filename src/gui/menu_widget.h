@@ -16,13 +16,13 @@
 
 struct App;
 
-typedef struct {
+struct MenuWidget {
 
     Texture btn_tex_open, btn_tex_tile, btn_tex_topo, btn_tex_catch;
 
     App* app;
 
-} MenuWidget;
+};
 
 /**
  * Create new MenuWidget instance

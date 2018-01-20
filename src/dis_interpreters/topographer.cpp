@@ -4,7 +4,6 @@
  * @date 07.01.18
  */
 
-#include <vector>
 #include <dis_tile/dis_tile.h>
 #include <math.h>
 #include <cstdio>
@@ -49,7 +48,7 @@ DisTile* Topographer__interpret_grayscale(GeoTile* geo_tile) {
     return dis_tile;
 }
 
-inline DisTileSample sample_gradient(const DisTileSample& start, const DisTileSample& finish, float grad_norm) {
+inline DisTileSample sample_gradient(const DisTileSample& start, const DisTileSample& finish, const float& grad_norm) {
     //assert(grad_norm >= 0);
     return {
         (unsigned char) (start.red + grad_norm*(finish.red - start.red)),
@@ -104,10 +103,70 @@ DisTile* Topographer__interpret_color(GeoTile* geo_tile) {
     return dis_tile;
 }
 
+DisTile* Topographer__interpret_param(GeoTile* geo_tile, const DisTileSample& lower, const DisTileSample& upper,
+                                      const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps) {
+    //START_BENCH(interpret_color)
+
+    DisTile* dis_tile = DisTile__create(geo_tile);
+    if(!dis_tile) return dis_tile;
+
+    DisTileSample* dis_data = (DisTileSample*) calloc(dis_tile->tile->height * dis_tile->tile->width, sizeof(DisTileSample));
+
+    for(size_t it = 0; it <= (dis_tile->tile->height * dis_tile->tile->width); it++) {
+        if(dis_tile->tile->data[it] < steps.begin()->second) {
+            dis_data[it] = lower;
+        } else if((steps.end()-1)->second < dis_tile->tile->data[it]) {
+            dis_data[it] = upper;
+        } else for(auto step = steps.begin(); step != steps.end(); step++) {
+            if(dis_tile->tile->data[it] <= step->second) {
+                float grad_norm = ((float)(dis_tile->tile->data[it] - (step-1)->second))/(step->second - (step-1)->second);
+                dis_data[it] = sample_gradient((step-1)->first, step->first, grad_norm);
+                break;
+            }
+        }
+    }
+
+    if(!DisTile__set_data(dis_tile, dis_data)) {
+        free(dis_data);
+        free(dis_tile);
+        return NULL;
+    }
+
+    //STOP_BENCH(interpret_color)
+
+    //fprintf(stderr, "Interpreted in %lf\n", GET_BENCH(interpret_color));
+
+    return dis_tile;
+}
+
 DisTile* Topographer__interpret(GeoTile* geo_tile, int is_color) {
-    if(is_color == 0)
-        return Topographer__interpret_grayscale(geo_tile);
-    else if(is_color == 1)
-        return Topographer__interpret_color(geo_tile);
+
+    std::vector< std::pair<DisTileSample, geo_sample_t> > steps;
+
+
+
+    if(is_color == 0) {
+        steps = {
+            std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32768),
+            std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32767),
+            std::make_pair((DisTileSample){ 000, 000, 000, 255 },      0),
+            std::make_pair((DisTileSample){ 255, 255, 255, 255 },   2000)
+        };
+        //return Topographer__interpret_grayscale(geo_tile);
+    } else if(is_color == 1) {
+        steps = {
+            std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32768),
+            std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32767),
+            std::make_pair((DisTileSample){ 000, 000, 255, 255 },      0),
+            std::make_pair((DisTileSample){ 000, 255, 000, 255 },      0),
+            std::make_pair((DisTileSample){ 255, 255, 000, 255 },    300),
+            std::make_pair((DisTileSample){ 255, 000, 000, 255 },   2000),
+            std::make_pair((DisTileSample){ 000, 000, 000, 255 },   8000)
+        };
+        //return Topographer__interpret_color(geo_tile);
+    }
+
+    return Topographer__interpret_param(geo_tile, { 000, 000, 000, 255 }, { 000, 000, 000, 255 }, steps);
+
     return NULL;
 }
