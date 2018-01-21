@@ -12,45 +12,94 @@
 
 #include "catchmenter.h"
 
-#define CORD(x, y) (y * dis_tile->tile->width + x)
-#define FROM_CORD_X(pos) (pos % dis_tile->tile->width)
-#define FROM_CORD_Y(pos) (pos / dis_tile->tile->width)
+#define CORD(x, y, w) (y * w + x)
+#define FROM_CORD_X(pos, w) (pos % w)
+#define FROM_CORD_Y(pos, w) (pos / w)
 
-DisTile* Catchmenter__color_pixel(GeoTile* geo_tile, DisTile* dis_tile, int x, int y) {
-    START_BENCH(catchmenter)
+// kernel
+bool is_local_minimum(const GeoTile* geo_tile, const int& pos_x, const int& pos_y, const Kernel& kernel) {
 
-    std::queue<std::pair<int, int>> q;
+    for(int i = 0; i < kernel.count; i++) {
+        int x = pos_x + kernel.dx[i];
+        int y = pos_y + kernel.dy[i];
 
-    q.push(std::make_pair(x, y));
+        if(x < 0 || x >= geo_tile->width || y < 0 || y >= geo_tile->height)
+            continue;
 
-    for(size_t it = 0; it <= (dis_tile->tile->height * dis_tile->tile->width); it ++) {
-        int px = (int)FROM_CORD_X(it);
-        int py = (int)FROM_CORD_Y(it);
-
-        if((x-px)*(x-px) + (y-py)*(y-py) <= 128) {
-            dis_tile->data[it] = {255, 0, 0, 255};
-            q.push(std::make_pair(px, py));
-        }
+        if(geo_tile->data[CORD(x, y, geo_tile->width)] < geo_tile->data[CORD(pos_x, pos_y, geo_tile->width)]
+            || (kernel.hard_min && geo_tile->data[CORD(x, y, geo_tile->width)] == geo_tile->data[CORD(pos_x, pos_y, geo_tile->width)]))
+            return false;
     }
 
+    return true;
+}
+
+Kernel K4 = {
+    4,
+    false,
+    { -1, 0, 1, 0 },
+    {  0,-1, 0, 1 }
+};
+
+Kernel K4_HARD_MIN = {
+    4,
+    true,
+    { -1, 0, 1, 0 },
+    {  0,-1, 0, 1 }
+};
+
+Kernel K8 = {
+    8,
+    false,
+    { -1,  0,  1, 1, 1, 0, -1, -1 },
+    { -1, -1, -1, 0, 1, 1,  1,  0 }
+};
+
+Kernel K8_HARD_MIN = {
+    8,
+    true,
+    { -1,  0,  1, 1, 1, 0, -1, -1 },
+    { -1, -1, -1, 0, 1, 1,  1,  0 }
+};
+
+DisTile* Catchmenter__color_pixel(const GeoTile* geo_tile, DisTile* dis_tile, const int& x, const int& y, const Kernel& kernel) {
+    START_BENCH(catchmenter)
+
+    std::queue<std::pair<std::pair<int, int>, DisTileSample>> q;
+
+    DisTileSample white = {255, 255, 255, 255};
+
+    for(size_t it = 0; it <= (dis_tile->tile->height * dis_tile->tile->width); it ++) {
+        int px = (int)FROM_CORD_X(it, dis_tile->tile->width);
+        int py = (int)FROM_CORD_Y(it, dis_tile->tile->width);
+        dis_tile->data[CORD(px, py, dis_tile->tile->width)] = white;
+    }
+
+    DisTileSample my_color = DisTileSample__random();
+    q.push(std::make_pair(std::make_pair(x, y), my_color));
+
+    DisTileSample same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+    dis_tile->data[CORD(x, y, dis_tile->tile->width)] = same_color;
+
+    fprintf(stderr, "local minima: %lu\n", q.size());
+
     while(!q.empty()) {
-        auto pos = q.front();
+        auto xpos = q.front();
+        auto pos = xpos.first;
+        auto color = xpos.second;
         q.pop();
 
-        int dx[] = { -1, 0, 1, 0 };
-        int dy[] = {  0,-1, 0, 1 };
+        for(int i = 0; i < kernel.count; i++) {
+            int nx = pos.first + kernel.dx[i];
+            int ny = pos.second + kernel.dy[i];
 
-        for(int i = 0; i < 4; i++) {
-            int x = pos.first + dx[i];
-            int y = pos.second + dy[i];
-
-            if(x < 0 || x >= dis_tile->tile->width || y < 0 || y >= dis_tile->tile->height)
+            if(nx < 0 || nx >= dis_tile->tile->width || ny < 0 || ny >= dis_tile->tile->height)
                 continue;
 
-            if(dis_tile->data[CORD(x, y)].red != 255 || dis_tile->data[CORD(x, y)].green != 255 || dis_tile->data[CORD(x, y)].blue != 255 || dis_tile->data[CORD(x, y)].alpha != 255) {
-                if(geo_tile->data[CORD(x, y)] >= geo_tile->data[CORD(pos.first, pos.second)]) {
-                    dis_tile->data[CORD(x, y)] = {255, 255, 255, 255};
-                    q.push(std::make_pair(x, y));
+            if(dis_tile->data[CORD(nx, ny, dis_tile->tile->width)] == white) {
+                if(geo_tile->data[CORD(nx, ny, dis_tile->tile->width)] >= geo_tile->data[CORD(pos.first, pos.second, dis_tile->tile->width)]) {
+                    dis_tile->data[CORD(nx, ny, dis_tile->tile->width)] = color;
+                    q.push(std::make_pair(std::make_pair(nx, ny), color));
                 }
             }
         }
@@ -60,12 +109,113 @@ DisTile* Catchmenter__color_pixel(GeoTile* geo_tile, DisTile* dis_tile, int x, i
     STOP_BENCH(catchmenter)
 
     fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
+}
 
-    //if(!DisTile__set_data(dis_tile, dis_data)) {
-    //    free(dis_data);
-    //    free(dis_tile);
-    //    return NULL;
-    //}
+DisTile* Catchmenter__color_all(const GeoTile* geo_tile, DisTile* dis_tile, const Kernel& kernel) {
+    START_BENCH(catchmenter)
 
-    //return dis_tile;
+    std::queue<std::pair<std::pair<int, int>, DisTileSample>> q;
+
+    DisTileSample white = {255, 255, 255, 255};
+
+    for(size_t it = 0; it <= (dis_tile->tile->height * dis_tile->tile->width); it ++) {
+        int px = (int)FROM_CORD_X(it, dis_tile->tile->width);
+        int py = (int)FROM_CORD_Y(it, dis_tile->tile->width);
+
+        dis_tile->data[CORD(px, py, dis_tile->tile->width)] = white;
+
+        if(is_local_minimum(geo_tile, px, py, kernel)) {
+            DisTileSample my_color = DisTileSample__random();
+            q.push(std::make_pair(std::make_pair(px, py), my_color));
+
+            DisTileSample same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+            dis_tile->data[CORD(px, py, dis_tile->tile->width)] = same_color;
+        }
+    }
+
+    fprintf(stderr, "local minima: %lu\n", q.size());
+
+    while(!q.empty()) {
+        auto xpos = q.front();
+        auto pos = xpos.first;
+        auto color = xpos.second;
+        q.pop();
+
+        for(int i = 0; i < kernel.count; i++) {
+            int nx = pos.first + kernel.dx[i];
+            int ny = pos.second + kernel.dy[i];
+
+            if(nx < 0 || nx >= dis_tile->tile->width || ny < 0 || ny >= dis_tile->tile->height)
+                continue;
+
+            if(dis_tile->data[CORD(nx, ny, dis_tile->tile->width)] == white) {
+                if(geo_tile->data[CORD(nx, ny, dis_tile->tile->width)] >= geo_tile->data[CORD(pos.first, pos.second, dis_tile->tile->width)]) {
+                    dis_tile->data[CORD(nx, ny, dis_tile->tile->width)] = color;
+                    q.push(std::make_pair(std::make_pair(nx, ny), color));
+                }
+            }
+        }
+
+    }
+
+    STOP_BENCH(catchmenter)
+
+    fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
+}
+
+DisTile* Catchmenter__color_all_immediate(const GeoTile* geo_tile, DisTile* dis_tile, const Kernel& kernel) {
+    START_BENCH(catchmenter)
+
+    std::queue<std::pair<std::pair<int, int>, DisTileSample>> q;
+
+    DisTileSample white = {255, 255, 255, 255};
+
+    for(size_t it = 0; it <= (dis_tile->tile->height * dis_tile->tile->width); it ++) {
+        int px = (int)FROM_CORD_X(it, dis_tile->tile->width);
+        int py = (int)FROM_CORD_Y(it, dis_tile->tile->width);
+
+        dis_tile->data[CORD(px, py, dis_tile->tile->width)] = white;
+    }
+
+    for(size_t it = 0; it <= (dis_tile->tile->height * dis_tile->tile->width); it ++) {
+        int px = (int)FROM_CORD_X(it, dis_tile->tile->width);
+        int py = (int)FROM_CORD_Y(it, dis_tile->tile->width);
+
+        if(is_local_minimum(geo_tile, px, py, kernel)) {
+            DisTileSample my_color = DisTileSample__random();
+            q.push(std::make_pair(std::make_pair(px, py), my_color));
+
+            DisTileSample same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+            dis_tile->data[CORD(px, py, dis_tile->tile->width)] = same_color;
+
+            fprintf(stderr, "local minimum (%d, %d)\n", px, py);
+
+            while(!q.empty()) {
+                auto xpos = q.front();
+                auto pos = xpos.first;
+                auto color = xpos.second;
+                q.pop();
+
+                for(int i = 0; i < kernel.count; i++) {
+                    int nx = pos.first + kernel.dx[i];
+                    int ny = pos.second + kernel.dy[i];
+
+                    if(nx < 0 || nx >= dis_tile->tile->width || ny < 0 || ny >= dis_tile->tile->height)
+                        continue;
+
+                    if(dis_tile->data[CORD(nx, ny, dis_tile->tile->width)] == white) {
+                        if(geo_tile->data[CORD(nx, ny, dis_tile->tile->width)] >= geo_tile->data[CORD(pos.first, pos.second, dis_tile->tile->width)]) {
+                            dis_tile->data[CORD(nx, ny, dis_tile->tile->width)] = color;
+                            q.push(std::make_pair(std::make_pair(nx, ny), color));
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    STOP_BENCH(catchmenter)
+
+    fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
 }

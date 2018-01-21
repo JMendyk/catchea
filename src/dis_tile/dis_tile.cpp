@@ -10,7 +10,25 @@
 
 #include "dis_tile.h"
 
+bool operator==(const DisTileSample& lhs, const DisTileSample& rhs) {
+    return lhs.red == rhs.red
+        && lhs.green == rhs.green
+        && lhs.blue == rhs.blue
+        && lhs.alpha == rhs.alpha;
+}
 
+bool operator!=(const DisTileSample& lhs, const DisTileSample& rhs) {
+    return !(lhs == rhs);
+}
+
+DisTileSample DisTileSample__random() {
+    return {
+        (unsigned char) (rand() % 256),
+        (unsigned char) (rand() % 256),
+        (unsigned char) (rand() % 256),
+        255
+    };
+}
 
 DisTile* DisTile__create(GeoTile* gtile) {
     DisTile* dtile = (DisTile*) malloc(sizeof(DisTile));

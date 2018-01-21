@@ -15,6 +15,11 @@ typedef struct {
     unsigned char red, green, blue, alpha;
 } DisTileSample;
 
+bool operator==(const DisTileSample& lhs, const DisTileSample& rhs);
+bool operator!=(const DisTileSample& lhs, const DisTileSample& rhs);
+
+DisTileSample DisTileSample__random();
+
 /**
  * @brief Represents graphical interpretation of data from GeoTile
  * @details

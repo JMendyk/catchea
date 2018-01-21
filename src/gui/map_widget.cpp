@@ -13,7 +13,9 @@
 #include "map_widget.h"
 #include "dis_interpreters/topographer.h"
 
+#include <string>
 
+#include <time.h>
 
 
 MapWidget* MapWidget__create() {
@@ -86,9 +88,33 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
         static ImVec2 scale = scroll_bound;
         static bool is_dragging = false;
 
-        ImVec2 old_offset = ImVec2(ImGui::GetScrollX(), ImGui::GetScrollY());
+        ImVec2 initial_scale = scale;
 
         if ((ImGui::IsWindowHovered() || is_dragging) && !ImGui::IsAnyItemActive()) {
+            if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftArrow))) {
+                scrolling.x += 16;
+            }
+
+            if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_RightArrow))) {
+                scrolling.x -= 16;
+            }
+
+            if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow))) {
+                scrolling.y += 16;
+            }
+
+            if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow))) {
+                scrolling.y -= 16;
+            }
+
+            if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageUp))) {
+                scale = scale + scale / 16.0;
+            }
+
+            if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_PageDown))) {
+                scale = scale - scale / 16.0;
+            }
+
             // Scroll using middle mouse button
             if (ImGui::IsMouseDragging(2, 0.0f)) {
                 scrolling = scrolling + ImGui::GetIO().MouseDelta;
@@ -113,22 +139,49 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
                     scrolling = scrolling + ImVec2(ImGui::GetIO().MouseWheel, 0) * wheelSpeed;
                 }
             }
+
+            scale.x = fmaxf(scale.x, scroll_bound.x);
+            scale.y = fmaxf(scale.y, scroll_bound.y);
         }
-
-        ImVec2 offset = old_offset - scrolling;
-        ImGui::SetScrollX(offset.x);
-        ImGui::SetScrollY(offset.y);
-
-        scale.x = fmaxf(scale.x, scroll_bound.x);
-        scale.y = fmaxf(scale.y, scroll_bound.y);
 
         ImVec2 image_size = ImVec2(mw->texTile.width * scale.x, mw->texTile.height * scale.y);
 
         ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
 
-        //static ImVec2 cord = ImVec2(2, 2);
+        ImVec2 center_point = (ImGui::GetIO().MousePos - ImGui::GetWindowPos());
 
-        if(ImGui::IsMouseDown(0)) {
+        ImVec2 old_offset = ImVec2(ImGui::GetScrollX(), ImGui::GetScrollY());
+        ImVec2 old_offset_centered = old_offset + center_point;
+
+        float scale_change = scale.x / initial_scale.x;
+
+        ImVec2 new_offset_centered = old_offset_centered * scale_change;
+
+        ImVec2 new_offset = new_offset_centered - center_point - scrolling;
+
+        ImGui::SetScrollX(new_offset.x);
+        ImGui::SetScrollY(new_offset.y);
+
+        ImVec2 CELL_SIZE = ImVec2(image_size.x / mw->texTile.width, image_size.y / mw->texTile.height);
+
+        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z))) {
+            // Updates existing DisTile instead of creating new one
+            ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
+
+            ImVec2 pos = ImVec2((int) floor(cord.x / CELL_SIZE.x), (int) floor(cord.y / CELL_SIZE.y));
+            int x = (int) pos.x;
+            int y = (int) pos.y;
+
+            ImGui::BeginTooltip();
+            ImGui::Text("%d, %d, %d\n", x, y, mw->app->geoTile->data[y * mw->app->geoTile->width + x]);
+            ImGui::Text("min: norm, HM");
+            ImGui::Text("K4: %d, %d\n", is_local_minimum(mw->app->geoTile, x, y, K4), is_local_minimum(mw->app->geoTile, x, y, K4_HARD_MIN));
+            ImGui::Text("K8: %d, %d\n", is_local_minimum(mw->app->geoTile, x, y, K8), is_local_minimum(mw->app->geoTile, x, y, K8_HARD_MIN));
+            ImGui::EndTooltip();
+        }
+
+        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(0)) {
+            srand(1);
             // Updates existing DisTile instead of creating new one
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
 
@@ -138,13 +191,24 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             cord.x = cord.x / image_size.x * mw->texTile.width;
             cord.y = cord.y / image_size.y * mw->texTile.height;
 
-            Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, static_cast<int>(cord.x),
-                                                        static_cast<int>(cord.y));
+            Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, (int) cord.x, (int) cord.y, K4);
             mw->texTile = DisTile__to_texture(mw->app->disTile);
         }
 
-        //ImGui::SetCursorPos(cord);
-        //ImGui::Button("Label");
+        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(0)) {
+            srand(1);
+            // Updates existing DisTile instead of creating new one
+            ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
+
+
+            rm_free_texture(mw->texTile);
+
+            cord.x = cord.x / image_size.x * mw->texTile.width;
+            cord.y = cord.y / image_size.y * mw->texTile.height;
+
+            Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, (int) cord.x, (int) cord.y, K8);
+            mw->texTile = DisTile__to_texture(mw->app->disTile);
+        }
 
 
         //ImU32 GRID_COLOR = ImColor(200, 200, 200, 40);
