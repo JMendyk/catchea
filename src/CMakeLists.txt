@@ -14,6 +14,9 @@ target_sources(${EXECUTABLE_NAME}
         ${SRC_DIR}/gui/control_widget.cpp
         ${SRC_DIR}/gui/footer_widget.cpp
 
+        ${SRC_DIR}/real_tile/real_tile.cpp
+        ${SRC_DIR}/real_tile/hgt_plugin.cpp
+
         ${SRC_DIR}/geo_tile/geo_tile.cpp
         ${SRC_DIR}/geo_tile/geo_tile_hgt_plugin.cpp
 

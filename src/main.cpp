@@ -4,11 +4,14 @@
  * @date 05.01.18
  */
 
+#define NDEBUG
+
 #include "app.h"
 
 
-
 int main(int argc, char *argv[]) {
+
+    assert(false);
 
     App* app = App__create();
 

@@ -102,7 +102,7 @@ GeoTile* GeoTile__merge(const GeoTile* first, const GeoTile* second) {
         if(!data) return NULL;
 
         geo_sample_dim_t offset = 0;
-        // WARNING: may crash if second->height == 0
+        // WARNING: may crash if second->heights == 0
         memcpy(data + offset, second->data, ((second->height - 1) * second->width)*sizeof(geo_sample_t));
         offset += (second->height - 1) * second->width;
 

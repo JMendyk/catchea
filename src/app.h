@@ -14,6 +14,7 @@ struct GLFWwindow;
 
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
+#include "real_tile/real_tile.h"
 
 struct GeoTile;
 struct DisTile;
@@ -31,6 +32,7 @@ struct App {
 
     GeoTile* geoTile;
     DisTile* disTile;
+    RealTile* realTile;
 
     MenuWidget* menuWidget;
     MapWidget* mapWidget;

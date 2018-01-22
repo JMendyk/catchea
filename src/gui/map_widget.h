@@ -65,6 +65,9 @@ void MapWidget__update_tile(MapWidget* mw);
 void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
                             const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
 
+void MapWidget__update_tile2(MapWidget* mw, const RealTile::Data& lower, const RealTile::Data& upper,
+                            const std::vector<std::pair<int, RealTile::Data>>& steps);
+
 /**
  * Terminate MapWidget before the application terminates
  * @remark Should only be called by App

@@ -12,7 +12,7 @@
 
 #include <dis_tile/dis_tile.h>
 
-
+#include "real_tile/real_tile.h"
 
 DisTile* Topographer__interpret_grayscale(GeoTile* geo_tile);
 
@@ -20,6 +20,12 @@ DisTile* Topographer__interpret_color(GeoTile* geo_tile);
 
 DisTile* Topographer__interpret_param(GeoTile* geo_tile, const DisTileSample& lower, const DisTileSample& upper,
                                       const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
+
+void Topographer__interpret(RealTile* real_tile,
+                            const RealTile::Data &lower,
+                            const RealTile::Data &upper,
+                            const std::vector<std::pair<int, RealTile::Data>> &steps);
+
 
 DisTile* Topographer__interpret(GeoTile* geo_tile, int is_color);
 

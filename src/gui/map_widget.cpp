@@ -16,7 +16,7 @@
 #include <string>
 
 #include <time.h>
-
+#include "real_tile/hgt_plugin.h"
 
 MapWidget* MapWidget__create() {
     MapWidget* mw = (MapWidget*) malloc(sizeof(MapWidget));
@@ -25,30 +25,14 @@ MapWidget* MapWidget__create() {
     return mw;
 }
 
-bool MapWidget__init(MapWidget* mw, App* app) {
-    mw->app = app;
-    mw->is_color = 0;
-
+inline bool loadGeoTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
     START_BENCH(map_load)
 
-    //START_BENCH(to_geo_tile)
-    //app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", 49, 14, 54, 23);
-
-    int lat = rand() % (54-49+1) + 49;
-    int lon = rand() % (23-14+1) + 14;
-
-    app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", lat, lon, lat, lon);
-
-    if(!app->geoTile)
+    mw->app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", lat_min, lon_min, lat_max, lon_max);
+    if(!mw->app->geoTile)
         return false;
 
-    //STOP_BENCH(to_geo_tile)
-
-    //fprintf(stderr, "Loading to GeoTile: %.2lf\n", GET_BENCH(to_geo_tile));
-
     MapWidget__update_tile(mw, { 000, 000, 000, 255 }, { 255, 000, 000, 255 }, {
-        //std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32768),
-        //std::make_pair((DisTileSample){ 000, 000, 000, 255 }, -32767),
         std::make_pair((DisTileSample){ 000, 000, 000, 255 },      0),
         std::make_pair((DisTileSample){ 255, 255, 255, 255 },   2000)
     });
@@ -56,6 +40,41 @@ bool MapWidget__init(MapWidget* mw, App* app) {
     STOP_BENCH(map_load)
 
     fprintf(stderr, "Total load time: %.2lf\n", GET_BENCH(map_load));
+}
+
+inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
+    START_BENCH(map_load)
+
+    mw->app->realTile = RealTile__from_hgt_file_batch("res/assets/tiles", lat_min, lon_min, lat_max, lon_max);
+    if(!mw->app->realTile)
+        return false;
+
+    MapWidget__update_tile2(mw, (RealTile::Data){ 000, 000, 000, 255 }, (RealTile::Data){ 255, 000, 000, 255 }, {
+        std::pair<int, RealTile::Data>(0000, { 000, 000, 000, 255 }),
+        std::pair<int, RealTile::Data>(2000, { 255, 255, 255, 255 })
+    });
+
+    STOP_BENCH(map_load)
+
+    fprintf(stderr, "RealTile total load time: %.2lf\n", GET_BENCH(map_load));
+}
+
+bool MapWidget__init(MapWidget* mw, App* app) {
+    mw->app = app;
+    mw->is_color = 0;
+
+    //49, 14, 54, 23
+
+    int lat = rand() % (54-49+1) + 49;
+    int lon = rand() % (23-14+1) + 14;
+
+    //loadRealTile(mw, lat, lon, lat, lon);
+    //
+    //loadGeoTile(mw, lat, lon, lat, lon);
+
+    loadRealTile(mw, 49, 14, 54, 23);
+
+    loadGeoTile(mw, 49, 14, 54, 23);
 
     return true;
 }
@@ -84,7 +103,8 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
         ImGui::SetWindowSize(window_size, ImGuiCond_Always);
 
         ImVec2 scrolling = ImVec2(0.0f, 0.0f);
-        const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->texTile.height, (ImGui::GetContentRegionAvail().y)/mw->texTile.height);
+        //const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->texTile.heights, (ImGui::GetContentRegionAvail().y)/mw->texTile.heights);
+        const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height, (ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height);
         static ImVec2 scale = scroll_bound;
         static bool is_dragging = false;
 
@@ -144,9 +164,11 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             scale.y = fmaxf(scale.y, scroll_bound.y);
         }
 
-        ImVec2 image_size = ImVec2(mw->texTile.width * scale.x, mw->texTile.height * scale.y);
+        //ImVec2 image_size = ImVec2(mw->texTile.width * scale.x, mw->texTile.heights * scale.y);
+        ImVec2 image_size = ImVec2(mw->app->realTile->tex->width * scale.x, mw->app->realTile->tex->height * scale.y);
 
-        ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
+        //ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
+        ImGui::Image((ImTextureID)mw->app->realTile->tex->texture_id, image_size);
 
         ImVec2 center_point = (ImGui::GetIO().MousePos - ImGui::GetWindowPos());
 
@@ -162,7 +184,8 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
         ImGui::SetScrollX(new_offset.x);
         ImGui::SetScrollY(new_offset.y);
 
-        ImVec2 CELL_SIZE = ImVec2(image_size.x / mw->texTile.width, image_size.y / mw->texTile.height);
+        //ImVec2 CELL_SIZE = ImVec2(image_size.x / mw->texTile.width, image_size.y / mw->texTile.heights);
+        ImVec2 CELL_SIZE = ImVec2(image_size.x / mw->app->realTile->tex->width, image_size.y / mw->app->realTile->tex->height);
 
         if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z))) {
             // Updates existing DisTile instead of creating new one
@@ -186,13 +209,17 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
 
 
-            rm_free_texture(mw->texTile);
+            //rm_free_texture(mw->texTile);
+            RealTile__texture_dealloc(mw->app->realTile);
 
-            cord.x = cord.x / image_size.x * mw->texTile.width;
-            cord.y = cord.y / image_size.y * mw->texTile.height;
+            //cord.x = cord.x / image_size.x * mw->texTile.width;
+            cord.x = cord.x / image_size.x * mw->app->realTile->tex->width;
+            //cord.y = cord.y / image_size.y * mw->texTile.heights;
+            cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
             Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, (int) cord.x, (int) cord.y, K4);
-            mw->texTile = DisTile__to_texture(mw->app->disTile);
+            //mw->texTile = DisTile__to_texture(mw->app->disTile);
+            RealTile__texture_create(mw->app->realTile);
         }
 
         if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(0)) {
@@ -201,13 +228,17 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
 
 
-            rm_free_texture(mw->texTile);
+            //rm_free_texture(mw->texTile);
+            RealTile__texture_dealloc(mw->app->realTile);
 
-            cord.x = cord.x / image_size.x * mw->texTile.width;
-            cord.y = cord.y / image_size.y * mw->texTile.height;
+            //cord.x = cord.x / image_size.x * mw->texTile.width;
+            cord.x = cord.x / image_size.x * mw->app->realTile->tex->width;
+            //cord.y = cord.y / image_size.y * mw->texTile.heights;
+            cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
             Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, (int) cord.x, (int) cord.y, K8);
-            mw->texTile = DisTile__to_texture(mw->app->disTile);
+            //mw->texTile = DisTile__to_texture(mw->app->disTile);
+            RealTile__texture_create(mw->app->realTile);
         }
 
 
@@ -236,6 +267,8 @@ void MapWidget__update_tile(MapWidget* mw) {
 
 void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
                             const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps) {
+    START_BENCH(MapWidget__update_tile)
+
     if(mw->app->disTile != NULL) {
         rm_free_texture(mw->texTile);
         DisTile__destroy(mw->app->disTile);
@@ -243,6 +276,26 @@ void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const Dis
 
     mw->app->disTile = Topographer__interpret_param(mw->app->geoTile, lower, upper, steps);
     mw->texTile = DisTile__to_texture(mw->app->disTile);
+
+    STOP_BENCH(MapWidget__update_tile)
+
+    fprintf(stderr, "MapWidget__update_tile %.2lf\n", GET_BENCH(MapWidget__update_tile));
+}
+
+void MapWidget__update_tile2(MapWidget* mw, const RealTile::Data& lower, const RealTile::Data& upper,
+                            const std::vector<std::pair<int, RealTile::Data>>& steps) {
+    START_BENCH(MapWidget__update_tile2)
+
+    if(mw->app->realTile->tex != NULL) {
+        RealTile__texture_dealloc(mw->app->realTile);
+    }
+
+    Topographer__interpret(mw->app->realTile, lower, upper, steps);
+    RealTile__texture_create(mw->app->realTile);
+
+    STOP_BENCH(MapWidget__update_tile2)
+
+    fprintf(stderr, "MapWidget__update_tile2 %.2lf\n", GET_BENCH(MapWidget__update_tile2));
 }
 
 bool MapWidget__terminate(MapWidget* mw) {

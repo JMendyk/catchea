@@ -16,10 +16,10 @@
  * @details
  * For example, to store UI icons/assets
  */
-typedef struct {
+struct Texture {
     GLuint texture_id;
     int width, height;
-} Texture;
+};
 
 /**
  * Load texture and register in OpenGL
