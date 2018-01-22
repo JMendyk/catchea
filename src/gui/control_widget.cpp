@@ -235,14 +235,14 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         ImGui::PushID("test123");
         {
 
-            static const RealTile::Data steps_lower = {000, 000, 000, 255, -1};
-            static const RealTile::Data steps_upper = {000, 000, 000, 255, -1};
+            static const RealTile::Data steps_lower = {000, 000, 000, 255};
+            static const RealTile::Data steps_upper = {000, 000, 000, 255};
 
-            static std::vector<RealTile::Data> steps = {
-                { 000, 000, 255, 255, 0    },
-                { 000, 255, 000, 255, 0    },
-                { 255, 255, 000, 255, 300  },
-                { 255, 000, 000, 255, 2000 },
+            static std::vector<std::pair<int, RealTile::Data>> steps = {
+                { 0, {000, 000, 255, 255} },
+                { 0, {000, 255, 000, 255} },
+                { 300, {255, 255, 000, 255} },
+                { 2000, {255, 000, 000, 255} },
             };
 
             ImGui::Columns(5, NULL, false);
@@ -253,7 +253,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
             float column_margin = 2 * ImGui::GetStyle().ItemSpacing.x;
 
             bool swap_elems = false;
-            typedef std::vector<RealTile::Data>::iterator iter;
+            typedef std::vector<std::pair<int, RealTile::Data>>::iterator iter;
             iter prev, next;
 
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
@@ -269,7 +269,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                     if (ImGui::Button("/\\", ImVec2(ImGui::GetColumnWidth() - column_margin / 2, 0))) {
                         prev = step - 1;
                         next = step;
-                        std::swap(prev->height, next->height);
+                        std::swap(prev->first, next->first);
                         iter_swap(prev, next);
                     }
                 }
@@ -280,35 +280,35 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                     if (ImGui::Button("\\/", ImVec2(ImGui::GetColumnWidth() - column_margin / 2, 0))) {
                         prev = step;
                         next = step + 1;
-                        std::swap(prev->height, next->height);
+                        std::swap(prev->first, next->first);
                         iter_swap(prev, next);
                     }
                 }
                 total_width += ImGui::GetColumnWidth();
                 ImGui::NextColumn();
 
-                RealTile::Data dts = *step;
+                RealTile::Data dts = step->second;
                 float sc = 1.0f / 255.0f;
                 float color[3] = {sc * dts.red, sc * dts.green, sc * dts.blue};
                 ImGui::PushItemWidth(ImGui::GetColumnWidth()/* - column_margin*/);
                 ImGui::ColorEdit3("", color, ImGuiColorEditFlags_NoInputs);
-                step->red = static_cast<unsigned char>(color[0] / sc);
-                step->green = static_cast<unsigned char>(color[1] / sc);
-                step->blue = static_cast<unsigned char>(color[2] / sc);
+                step->second.red = static_cast<unsigned char>(color[0] / sc);
+                step->second.green = static_cast<unsigned char>(color[1] / sc);
+                step->second.blue = static_cast<unsigned char>(color[2] / sc);
 
                 total_width += ImGui::GetColumnWidth();
                 ImGui::NextColumn();
 
-                int x = step->height;
+                int x = step->first;
                 // @VERSION: 2
                 int v_min = x - 1000;
                 int v_max = x + 1000;
 
                 if (step != steps.begin())
-                    v_min = (step - 1)->height;
+                    v_min = (step - 1)->first;
 
                 if (step + 1 != steps.end())
-                    v_max = (step + 1)->height;
+                    v_max = (step + 1)->first;
 
                 ImGui::PushItemWidth(ImGui::GetColumnWidth() - column_margin / 2);
                 // @VERSION: 2.1
@@ -317,7 +317,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                 ImGui::DragInt("2", &x, 1.0f, v_min, v_max);
 
                 // @VERSION: 2
-                step->height = x;
+                step->first = x;
 
                 total_width += ImGui::GetColumnWidth();
                 ImGui::NextColumn();
@@ -340,7 +340,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
 
             if (ImGui::Button("Add")) {
                 steps.insert(steps.end(),
-                             { 000, 000, 000, 255, (steps.end() - 1)->height });
+                             { (steps.end() - 1)->first, {000, 000, 000, 255} });
             }
 
             if (ImGui::Button("Apply changes")) {

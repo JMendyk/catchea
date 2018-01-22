@@ -25,7 +25,7 @@ RealTile* RealTile__create(int lat, int lon, int lat_size, int lon_size) {
     tile->height = tile->width = -1;
     tile->data = NULL;
 
-    //tile->heights = NULL;
+    tile->heights = NULL;
 
     tile->tex = NULL;
 
@@ -60,9 +60,9 @@ bool RealTile__data_alloc(RealTile* tile, int height, int width) {
     tile->width = width;
     size_t size = static_cast<size_t>(height * width);
     tile->data = (RealTile::Data*) calloc(size, sizeof(RealTile::Data));
-    //tile->heights = (int*) calloc(size, sizeof(int));
+    tile->heights = (int*) calloc(size, sizeof(int));
 
-    return tile->data != NULL;// && tile->heights != NULL;
+    return tile->data != NULL && tile->heights != NULL;
 }
 
 void RealTile__data_place(RealTile* tile,
@@ -77,7 +77,7 @@ void RealTile__data_place(RealTile* tile,
 
     for (int v_pos = 0; v_pos < height; v_pos++) {
         memcpy(tile->data + tile_offset, data + data_offset, width * sizeof(RealTile::Data));
-        //memcpy(tile->heights + tile_offset, heights + data_offset, width * sizeof(int));
+        memcpy(tile->heights + tile_offset, heights + data_offset, width * sizeof(int));
         tile_offset += tile->width;
         data_offset += width;
     }
@@ -90,8 +90,8 @@ void RealTile__data_dealloc(RealTile* tile) {
     tile->height = tile->width = -1;
     tile->data = NULL;
 
-    //free(tile->heights);
-    //tile->heights = NULL;
+    free(tile->heights);
+    tile->heights = NULL;
 }
 
 bool RealTile__texture_alloc(RealTile* tile) {
@@ -187,7 +187,7 @@ bool RealTile__texture_create(RealTile* tile) {
     // Instead I will add dummy alpha channels to data provided to this function
     //
     // glPixelStorei(GL_UNPACK_ROW_LENGTH, 3);
-    // glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // correction, should be 1
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 8); // correction, should be 1
 
     GLint unpack_row_length, unpack_skip_pixels, unpack_alignment;
 
@@ -195,9 +195,7 @@ bool RealTile__texture_create(RealTile* tile) {
     glGetIntegerv(GL_UNPACK_SKIP_PIXELS, &unpack_skip_pixels);
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
 
-    fprintf(stderr, "row len %d, skip pixels %d, align %d\n", unpack_row_length, unpack_skip_pixels, unpack_alignment);
-
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, tile->tex->width/8);
+    //glPixelStorei(GL_UNPACK_ROW_LENGTH, 1 * tile->tex->width);
     //glPixelStorei(GL_UNPACK_SKIP_PIXELS, 2);
     //glPixelStorei(GL_UNPACK_ALIGNMENT, tile->tex->width);
 
