@@ -34,14 +34,12 @@ struct RealTile {
         //    //    return {red, green, blue};
         //    //}
         //} color;
-        //unsigned int empty;
         unsigned char red;
         unsigned char green;
         unsigned char blue;
         unsigned char alpha;
+        int height;
     } * data;
-
-    int* heights;
 
     Texture* tex;
 };

@@ -49,9 +49,9 @@ inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, 
     if(!mw->app->realTile)
         return false;
 
-    MapWidget__update_tile2(mw, (RealTile::Data){ 000, 000, 000, 255 }, (RealTile::Data){ 255, 000, 000, 255 }, {
-        std::pair<int, RealTile::Data>(0000, { 000, 000, 000, 255 }),
-        std::pair<int, RealTile::Data>(2000, { 255, 255, 255, 255 })
+    MapWidget__update_tile2(mw, { 000, 000, 000, 255, -1 }, { 255, 000, 000, 255, -1 }, {
+        { 000, 000, 000, 255, 0000 },
+        { 255, 255, 255, 255, 2000 }
     });
 
     STOP_BENCH(map_load)
@@ -68,13 +68,13 @@ bool MapWidget__init(MapWidget* mw, App* app) {
     int lat = rand() % (54-49+1) + 49;
     int lon = rand() % (23-14+1) + 14;
 
-    //loadRealTile(mw, lat, lon, lat, lon);
+    loadRealTile(mw, lat, lon, lat, lon);
     //
     //loadGeoTile(mw, lat, lon, lat, lon);
 
-    loadRealTile(mw, 49, 14, 54, 23);
+    //loadRealTile(mw, 49, 14, 54, 23);
 
-    loadGeoTile(mw, 49, 14, 54, 23);
+    //loadGeoTile(mw, 49, 14, 54, 23);
 
     return true;
 }
@@ -105,7 +105,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
         ImVec2 scrolling = ImVec2(0.0f, 0.0f);
         //const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->texTile.heights, (ImGui::GetContentRegionAvail().y)/mw->texTile.heights);
         const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height, (ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height);
-        static ImVec2 scale = scroll_bound;
+        static ImVec2 scale = scroll_bound * 128;
         static bool is_dragging = false;
 
         ImVec2 initial_scale = scale;
@@ -283,7 +283,7 @@ void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const Dis
 }
 
 void MapWidget__update_tile2(MapWidget* mw, const RealTile::Data& lower, const RealTile::Data& upper,
-                            const std::vector<std::pair<int, RealTile::Data>>& steps) {
+                            const std::vector<RealTile::Data>& steps) {
     START_BENCH(MapWidget__update_tile2)
 
     if(mw->app->realTile->tex != NULL) {
