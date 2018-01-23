@@ -211,7 +211,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             ImGui::EndTooltip();
         }
 
-        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(0)) {
+        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseReleased(0)) {
             srand(1);
             // Updates existing DisTile instead of creating new one
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
@@ -225,12 +225,17 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             //cord.y = cord.y / image_size.y * mw->texTile.heights;
             cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
-            Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K4);
+            bool* visi_matrix = (bool*) calloc(mw->app->realTile->height * mw->app->realTile->width, sizeof(bool));
+
+            Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K4 : K4_HARD_MIN);
+
+            free(visi_matrix);
+            //Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K4);
             //mw->texTile = DisTile__to_texture(mw->app->disTile);
             RealTile__texture_generate(mw->app->realTile);
         }
 
-        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(1)) {
+        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseReleased(1)) {
             srand(1);
             // Updates existing DisTile instead of creating new one
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
@@ -244,7 +249,12 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             //cord.y = cord.y / image_size.y * mw->texTile.heights;
             cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
-            Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K8);
+            bool* visi_matrix = (bool*) calloc(mw->app->realTile->height * mw->app->realTile->width, sizeof(bool));
+
+            Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K8 : K8_HARD_MIN);
+
+            free(visi_matrix);
+            //Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K8);
             //mw->texTile = DisTile__to_texture(mw->app->disTile);
             RealTile__texture_generate(mw->app->realTile);
         }

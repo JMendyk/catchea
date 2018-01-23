@@ -409,6 +409,15 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                 catchmented = true;
                 Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K8_HARD_MIN);
             }
+            if (ImGui::Button("Catch8 all")) {
+                catchmented = true;
+                Catchmenter__all(cw->app->realTile, K8);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Catch8 HM all")) {
+                catchmented = true;
+                Catchmenter__all(cw->app->realTile, K8_HARD_MIN);
+            }
 
             if (catchmented) {
                 RealTile__texture_generate(cw->app->realTile);

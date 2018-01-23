@@ -286,6 +286,96 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
     fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
 }
 
+void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, const int& from_y, const Kernel& kernel) {
+    START_BENCH(catchmenter)
+
+    fprintf(stderr, "Kernel %d with%s HM\n", kernel.count, kernel.hard_min ? "": "out");
+
+    std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+
+    RealTile::Data my_color = RealTile__random_color();
+    q.push(std::make_pair(std::make_pair(from_x, from_y), my_color));
+    visi_matrix[CORD(from_x, from_y, tile->width)] = true;
+
+    RealTile::Data same_color = {
+            (unsigned char) (my_color.red * 0.5f),
+            (unsigned char) (my_color.green * 0.5f),
+            (unsigned char) (my_color.blue * 0.5f),
+            255
+    };
+
+    tile->coloring[CORD(from_x, from_y, tile->width)] = same_color;
+
+    while(!q.empty()) {
+        auto xpos = q.front();
+        q.pop();
+        auto pos = xpos.first;
+        auto color = xpos.second;
+
+        for(int i = 0; i < kernel.count; i++) {
+            int nx = pos.first + kernel.dx[i];
+            int ny = pos.second + kernel.dy[i];
+
+            if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+                continue;
+
+            if(!visi_matrix[CORD(nx, ny, tile->width)]) {
+                visi_matrix[CORD(nx, ny, tile->width)] = true;
+                if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
+                    tile->coloring[CORD(nx, ny, tile->width)] = color;
+                    q.push(std::make_pair(std::make_pair(nx, ny), color));
+                }
+            }
+        }
+    }
+
+    STOP_BENCH(catchmenter)
+
+    fprintf(stderr, "Catchmented from (%d, %d) in %lf\n", from_x, from_y, GET_BENCH(catchmenter));
+}
+
+void Catchmenter__all(RealTile* tile, const Kernel& kernel) {
+    //START_BENCH(catchmenter)
+
+
+    static bool* visi_matrix = NULL;
+    static size_t it = 0;
+
+    if(visi_matrix == NULL) {
+        visi_matrix = (bool*) calloc(tile->height * tile->width, sizeof(bool));
+        it = 0;
+    }
+
+    int minimums_left = 50000;
+
+    for(; it < (tile->height * tile->width); it++) {
+        int px = (int)FROM_CORD_X(it, tile->width);
+        int py = (int)FROM_CORD_Y(it, tile->width);
+
+        if(is_local_minimum(tile, px, py, kernel)) {
+            if(visi_matrix[CORD(px, py, tile->width)]) {
+                fprintf(stderr, "oppps... %d %d\n", px, py);
+            }
+            Catchmenter__from(tile, visi_matrix, px, py, kernel);
+            minimums_left--;
+
+            if(minimums_left == 0) {
+                it++;
+                break;
+            }
+        }
+    }
+
+    if(it == tile->height * tile->width) {
+        free(visi_matrix);
+        visi_matrix = NULL;
+    }
+
+    //STOP_BENCH(catchmenter)
+    //
+    //fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
+}
+
 void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
     START_BENCH(catchmenter)
 
