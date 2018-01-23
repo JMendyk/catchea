@@ -354,47 +354,47 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
 
             if (ImGui::Button("Catch4")) {
                 catchmented = true;
-                //Catchmenter__color_all(cw->app->geoTile, cw->app->disTile, K4);
+                Catchmenter__color_all(cw->app->realTile, K4);
             }
             ImGui::SameLine();
             if (ImGui::Button("Catch4 immediate")) {
                 catchmented = true;
-                //Catchmenter__color_all_immediate(cw->app->geoTile, cw->app->disTile, K4);
+                Catchmenter__color_all_immediate(cw->app->realTile, K4);
             }
             if (ImGui::Button("Catch4 HM")) {
                 catchmented = true;
-                //Catchmenter__color_all(cw->app->geoTile, cw->app->disTile, K4_HARD_MIN);
+                Catchmenter__color_all(cw->app->realTile, K4_HARD_MIN);
             }
             ImGui::SameLine();
             if (ImGui::Button("Catch4 HM immediate")) {
                 catchmented = true;
-                //Catchmenter__color_all_immediate(cw->app->geoTile, cw->app->disTile, K4_HARD_MIN);
+                Catchmenter__color_all_immediate(cw->app->realTile, K4_HARD_MIN);
             }
 
             ImGui::Separator();
 
             if (ImGui::Button("Catch8")) {
                 catchmented = true;
-                //Catchmenter__color_all(cw->app->geoTile, cw->app->disTile, K8);
+                Catchmenter__color_all(cw->app->realTile, K8);
             }
             ImGui::SameLine();
             if (ImGui::Button("Catch8 immediate")) {
                 catchmented = true;
-                //Catchmenter__color_all_immediate(cw->app->geoTile, cw->app->disTile, K8);
+                Catchmenter__color_all_immediate(cw->app->realTile, K8);
             }
             if (ImGui::Button("Catch8 HM")) {
                 catchmented = true;
-                //Catchmenter__color_all(cw->app->geoTile, cw->app->disTile, K8_HARD_MIN);
+                Catchmenter__color_all(cw->app->realTile, K8_HARD_MIN);
             }
             ImGui::SameLine();
             if (ImGui::Button("Catch8 HM immediate")) {
                 catchmented = true;
-                //Catchmenter__color_all_immediate(cw->app->geoTile, cw->app->disTile, K8_HARD_MIN);
+                Catchmenter__color_all_immediate(cw->app->realTile, K8_HARD_MIN);
             }
 
             if (catchmented) {
-                //rm_free_texture(cw->app->mapWidget->texTile);
-                //cw->app->mapWidget->texTile = DisTile__to_texture(cw->app->disTile);
+                RealTile__texture_dealloc(cw->app->realTile);
+                RealTile__texture_create(cw->app->realTile);
             }
 
         }

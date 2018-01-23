@@ -13,6 +13,26 @@
 #include <resource_manager.h>
 #include <cstdio>
 
+bool operator==(const RealTile::Data& lhs, const RealTile::Data& rhs) {
+    return lhs.red == rhs.red
+           && lhs.green == rhs.green
+           && lhs.blue == rhs.blue
+           && lhs.alpha == rhs.alpha;
+}
+
+bool operator!=(const RealTile::Data& lhs, const RealTile::Data& rhs) {
+    return !(lhs == rhs);
+}
+
+RealTile::Data RealTile__random_color() {
+    return {
+            (unsigned char) (rand() % 256),
+            (unsigned char) (rand() % 256),
+            (unsigned char) (rand() % 256),
+            255
+    };
+}
+
 RealTile* RealTile__create(int lat, int lon, int lat_size, int lon_size) {
     RealTile* tile = (RealTile*) malloc(sizeof(RealTile));
     if (!tile) return tile;

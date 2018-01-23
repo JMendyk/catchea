@@ -74,7 +74,7 @@ bool MapWidget__init(MapWidget* mw, App* app) {
 
     loadRealTile(mw, 49, 14, 54, 23);
 
-    loadGeoTile(mw, 49, 14, 54, 23);
+    //loadGeoTile(mw, 49, 14, 54, 23);
 
     return true;
 }
@@ -196,10 +196,10 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             int y = (int) pos.y;
 
             ImGui::BeginTooltip();
-            ImGui::Text("%d, %d, %d\n", x, y, mw->app->geoTile->data[y * mw->app->geoTile->width + x]);
+            ImGui::Text("%d, %d, %d\n", x, y, mw->app->realTile->heights[y * mw->app->realTile->width + x]);
             ImGui::Text("min: norm, HM");
-            ImGui::Text("K4: %d, %d\n", is_local_minimum(mw->app->geoTile, x, y, K4), is_local_minimum(mw->app->geoTile, x, y, K4_HARD_MIN));
-            ImGui::Text("K8: %d, %d\n", is_local_minimum(mw->app->geoTile, x, y, K8), is_local_minimum(mw->app->geoTile, x, y, K8_HARD_MIN));
+            ImGui::Text("K4: %d, %d\n", is_local_minimum(mw->app->realTile, x, y, K4), is_local_minimum(mw->app->realTile, x, y, K4_HARD_MIN));
+            ImGui::Text("K8: %d, %d\n", is_local_minimum(mw->app->realTile, x, y, K8), is_local_minimum(mw->app->realTile, x, y, K8_HARD_MIN));
             ImGui::EndTooltip();
         }
 
@@ -210,15 +210,16 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
 
             //rm_free_texture(mw->texTile);
-            RealTile__texture_dealloc(mw->app->realTile);
+            //RealTile__texture_dealloc(mw->app->realTile);
 
             //cord.x = cord.x / image_size.x * mw->texTile.width;
             cord.x = cord.x / image_size.x * mw->app->realTile->tex->width;
             //cord.y = cord.y / image_size.y * mw->texTile.heights;
             cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
-            Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, (int) cord.x, (int) cord.y, K4);
+            Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K4);
             //mw->texTile = DisTile__to_texture(mw->app->disTile);
+            RealTile__texture_dealloc(mw->app->realTile);
             RealTile__texture_create(mw->app->realTile);
         }
 
@@ -229,15 +230,16 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
 
             //rm_free_texture(mw->texTile);
-            RealTile__texture_dealloc(mw->app->realTile);
+            //RealTile__texture_dealloc(mw->app->realTile);
 
             //cord.x = cord.x / image_size.x * mw->texTile.width;
             cord.x = cord.x / image_size.x * mw->app->realTile->tex->width;
             //cord.y = cord.y / image_size.y * mw->texTile.heights;
             cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
-            Catchmenter__color_pixel(mw->app->geoTile, mw->app->disTile, (int) cord.x, (int) cord.y, K8);
+            Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K8);
             //mw->texTile = DisTile__to_texture(mw->app->disTile);
+            RealTile__texture_dealloc(mw->app->realTile);
             RealTile__texture_create(mw->app->realTile);
         }
 

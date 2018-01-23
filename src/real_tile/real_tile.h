@@ -46,6 +46,11 @@ struct RealTile {
     Texture* tex;
 };
 
+bool operator==(const RealTile::Data& lhs, const RealTile::Data& rhs);
+bool operator!=(const RealTile::Data& lhs, const RealTile::Data& rhs);
+
+RealTile::Data RealTile__random_color();
+
 RealTile* RealTile__create(int lat, int lon, int lat_size, int lon_size);
 
 bool RealTile__is_equal(const RealTile* lhs, const RealTile* rhs);

@@ -5,8 +5,8 @@
  */
 
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+//#include "stb_image_write.h"
 
 #include "dis_tile.h"
 
@@ -87,5 +87,5 @@ Texture DisTile__to_texture(const DisTile* dis_tile) {
 }
 
 void DisTile__save_to_file(const DisTile* dis_tile, char const* filename) {
-    stbi_write_png(filename, dis_tile->tile->width, dis_tile->tile->height, 4, dis_tile->data, dis_tile->tile->width * sizeof(DisTileSample));
+//    stbi_write_png(filename, dis_tile->tile->width, dis_tile->tile->height, 4, dis_tile->data, dis_tile->tile->width * sizeof(DisTileSample));
 }
