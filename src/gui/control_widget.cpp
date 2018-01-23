@@ -393,8 +393,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
             }
 
             if (catchmented) {
-                RealTile__texture_dealloc(cw->app->realTile);
-                RealTile__texture_create(cw->app->realTile);
+                RealTile__texture_generate(cw->app->realTile);
             }
 
         }

@@ -43,11 +43,12 @@ RealTile* RealTile__create(int lat, int lon, int lat_size, int lon_size) {
     tile->lon_size = lon_size;
 
     tile->height = tile->width = -1;
-    tile->data = NULL;
+    tile->coloring = NULL;
 
     tile->heights = NULL;
 
     tile->tex = NULL;
+    RealTile__texture_alloc(tile);
 
     return tile;
 }
@@ -74,15 +75,15 @@ bool RealTile__is_next_lon(const RealTile* first, const RealTile* next) {
 }
 
 bool RealTile__data_alloc(RealTile* tile, int height, int width) {
-    assert(tile->data == NULL);
+    assert(tile->coloring == NULL);
 
     tile->height = height;
     tile->width = width;
     size_t size = static_cast<size_t>(height * width);
-    tile->data = (RealTile::Data*) calloc(size, sizeof(RealTile::Data));
+    tile->coloring = (RealTile::Data*) calloc(size, sizeof(RealTile::Data));
     tile->heights = (int*) calloc(size, sizeof(int));
 
-    return tile->data != NULL && tile->heights != NULL;
+    return tile->coloring != NULL && tile->heights != NULL;
 }
 
 void RealTile__data_place(RealTile* tile,
@@ -96,7 +97,7 @@ void RealTile__data_place(RealTile* tile,
     int data_offset = 0;
 
     for (int v_pos = 0; v_pos < height; v_pos++) {
-        memcpy(tile->data + tile_offset, data + data_offset, width * sizeof(RealTile::Data));
+        memcpy(tile->coloring + tile_offset, data + data_offset, width * sizeof(RealTile::Data));
         memcpy(tile->heights + tile_offset, heights + data_offset, width * sizeof(int));
         tile_offset += tile->width;
         data_offset += width;
@@ -104,11 +105,11 @@ void RealTile__data_place(RealTile* tile,
 }
 
 void RealTile__data_dealloc(RealTile* tile) {
-    assert(tile->data != NULL);
+    assert(tile->coloring != NULL);
 
-    free(tile->data);
+    free(tile->coloring);
     tile->height = tile->width = -1;
-    tile->data = NULL;
+    tile->coloring = NULL;
 
     free(tile->heights);
     tile->heights = NULL;
@@ -121,10 +122,6 @@ bool RealTile__texture_alloc(RealTile* tile) {
     if (!tile->tex) return false;
 
     return true;
-}
-
-bool RealTile__texture_set(RealTile* tile) {
-
 }
 
 bool RealTile__texture_dealloc(RealTile* tile) {
@@ -148,10 +145,10 @@ bool RealTile__texture_dealloc(RealTile* tile) {
 //
 //        int offset = 0;
 //        // WARNING: may crash if second->heights == 0
-//        memcpy(merged->data + offset, second->data, ((second->heights - 1) * second->width) * sizeof(RealTile::Data));
+//        memcpy(merged->coloring + offset, second->coloring, ((second->heights - 1) * second->width) * sizeof(RealTile::Data));
 //        offset += (second->heights - 1) * second->width;
 //
-//        memcpy(merged->data + offset, first->data, (first->heights * first->width) * sizeof(RealTile::Data));
+//        memcpy(merged->coloring + offset, first->coloring, (first->heights * first->width) * sizeof(RealTile::Data));
 //        offset += first->heights * first->width;
 //
 //        assert(offset == heights * width);
@@ -166,9 +163,9 @@ bool RealTile__texture_dealloc(RealTile* tile) {
 //        int offset = 0;
 //        for (int h = 0; h < heights; h++) {
 //            // WARNING: may crash if first->width == 0
-//            memcpy(merged->data + offset, first->data + first->width * h, (first->width - 1) * sizeof(RealTile::Data));
+//            memcpy(merged->coloring + offset, first->coloring + first->width * h, (first->width - 1) * sizeof(RealTile::Data));
 //            offset += first->width - 1;
-//            memcpy(merged->data + offset, second->data + second->width * h, (second->width) * sizeof(RealTile::Data));
+//            memcpy(merged->coloring + offset, second->coloring + second->width * h, (second->width) * sizeof(RealTile::Data));
 //            offset += second->width;
 //        }
 //
@@ -180,12 +177,12 @@ bool RealTile__texture_dealloc(RealTile* tile) {
 
 void RealTile__destroy(RealTile* tile) {
     RealTile__data_dealloc(tile);
+    RealTile__texture_dealloc(tile);
+
     free(tile);
 }
-bool RealTile__texture_create(RealTile* tile) {
-    RealTile__texture_alloc(tile);
 
-    //fprintf(stderr, "RealTile::Data: %zu\n", sizeof(RealTile::Data));
+bool RealTile__texture_generate(RealTile *tile) {
 
     tile->tex->width = tile->width;
     tile->tex->height = tile->height;
@@ -204,7 +201,7 @@ bool RealTile__texture_create(RealTile* tile) {
     // OpenGL wants pixels to be (by default) every 4 bytes,
     // thus with RGB image every pixel lacks 1 byte. Some libs may add dummy byte to align properly.
     // One way to fix it is to modify OpenGL settings, however these are global and I'd like to avoid that.
-    // Instead I will add dummy alpha channels to data provided to this function
+    // Instead I will add dummy alpha channels to coloring provided to this function
     //
     // glPixelStorei(GL_UNPACK_ROW_LENGTH, 3);
     // glPixelStorei(GL_UNPACK_ALIGNMENT, 8); // correction, should be 1
@@ -227,7 +224,7 @@ bool RealTile__texture_create(RealTile* tile) {
                  tile->tex->width,
                  tile->tex->height,
                  0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, tile->data);
+                 GL_UNSIGNED_BYTE, tile->coloring);
 
     glPixelStorei(GL_UNPACK_ROW_LENGTH, unpack_row_length);
     glPixelStorei(GL_UNPACK_SKIP_PIXELS, unpack_skip_pixels);

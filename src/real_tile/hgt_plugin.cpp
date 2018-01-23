@@ -102,7 +102,7 @@ RealTile* RealTile__from_hgt_file_batch(
             int place_y = (SAMPLES_PER_AXIS-1) * (lat_max - curr_lat);
             int place_x = (SAMPLES_PER_AXIS-1) * (curr_lon - lon_min);
 
-            RealTile__data_place(ret, SAMPLES_PER_AXIS, SAMPLES_PER_AXIS, tile->heights, tile->data, place_y, place_x);
+            RealTile__data_place(ret, SAMPLES_PER_AXIS, SAMPLES_PER_AXIS, tile->heights, tile->coloring, place_y, place_x);
 
             RealTile__destroy(tile);
         }

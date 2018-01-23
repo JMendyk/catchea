@@ -16,30 +16,11 @@ struct RealTile {
     int height, width;
 
     struct Data {
-        //struct Color {
-        //
-        //    //operator int[4]() {
-        //    //    return {red, green, blue, alpha};
-        //    //}
-        //    //
-        //    //operator int[3]() {
-        //    //    return {red, green, blue};
-        //    //}
-        //    //
-        //    //operator float[4]() {
-        //    //    return {red, green, blue, alpha};
-        //    //}
-        //    //
-        //    //operator float[3]() {
-        //    //    return {red, green, blue};
-        //    //}
-        //} color;
-        //unsigned int empty;
         unsigned char red;
         unsigned char green;
         unsigned char blue;
         unsigned char alpha;
-    } * data;
+    }* coloring;
 
     int* heights;
 
@@ -68,10 +49,9 @@ void RealTile__data_place(RealTile* tile,
 void RealTile__data_dealloc(RealTile* tile);
 
 bool RealTile__texture_alloc(RealTile* tile);
-bool RealTile__texture_set(RealTile* tile);
 bool RealTile__texture_dealloc(RealTile* tile);
 
-bool RealTile__texture_create(RealTile* tile);
+bool RealTile__texture_generate(RealTile *tile);
 
 void RealTile__destroy(RealTile* tile);
 

@@ -247,14 +247,14 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
     for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
         int px = (int)FROM_CORD_X(it, tile->width);
         int py = (int)FROM_CORD_Y(it, tile->width);
-        tile->data[CORD(px, py, tile->width)] = white;
+        tile->coloring[CORD(px, py, tile->width)] = white;
     }
 
     RealTile::Data my_color = RealTile__random_color();
     q.push(std::make_pair(std::make_pair(x, y), my_color));
 
     RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
-    tile->data[CORD(x, y, tile->width)] = same_color;
+    tile->coloring[CORD(x, y, tile->width)] = same_color;
 
     fprintf(stderr, "local minima: %lu\n", q.size());
 
@@ -271,9 +271,9 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
             if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
                 continue;
 
-            if(tile->data[CORD(nx, ny, tile->width)] == white) {
+            if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
                 if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
-                    tile->data[CORD(nx, ny, tile->width)] = color;
+                    tile->coloring[CORD(nx, ny, tile->width)] = color;
                     q.push(std::make_pair(std::make_pair(nx, ny), color));
                 }
             }
@@ -297,14 +297,14 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
         int px = (int)FROM_CORD_X(it, tile->width);
         int py = (int)FROM_CORD_Y(it, tile->width);
 
-        tile->data[CORD(px, py, tile->width)] = white;
+        tile->coloring[CORD(px, py, tile->width)] = white;
 
         if(is_local_minimum(tile, px, py, kernel)) {
             RealTile::Data my_color = RealTile__random_color();
             q.push(std::make_pair(std::make_pair(px, py), my_color));
 
             RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
-            tile->data[CORD(px, py, tile->width)] = same_color;
+            tile->coloring[CORD(px, py, tile->width)] = same_color;
         }
     }
 
@@ -323,9 +323,9 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
             if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
                 continue;
 
-            if(tile->data[CORD(nx, ny, tile->width)] == white) {
+            if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
                 if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
-                    tile->data[CORD(nx, ny, tile->width)] = color;
+                    tile->coloring[CORD(nx, ny, tile->width)] = color;
                     q.push(std::make_pair(std::make_pair(nx, ny), color));
                 }
             }
@@ -349,7 +349,7 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
         int px = (int)FROM_CORD_X(it, tile->width);
         int py = (int)FROM_CORD_Y(it, tile->width);
 
-        tile->data[CORD(px, py, tile->width)] = white;
+        tile->coloring[CORD(px, py, tile->width)] = white;
     }
 
     for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
@@ -361,7 +361,7 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
             q.push(std::make_pair(std::make_pair(px, py), my_color));
 
             RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
-            tile->data[CORD(px, py, tile->width)] = same_color;
+            tile->coloring[CORD(px, py, tile->width)] = same_color;
 
             fprintf(stderr, "local minimum (%d, %d)\n", px, py);
 
@@ -378,9 +378,9 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
                     if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
                         continue;
 
-                    if(tile->data[CORD(nx, ny, tile->width)] == white) {
+                    if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
                         if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
-                            tile->data[CORD(nx, ny, tile->width)] = color;
+                            tile->coloring[CORD(nx, ny, tile->width)] = color;
                             q.push(std::make_pair(std::make_pair(nx, ny), color));
                         }
                     }

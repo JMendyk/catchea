@@ -223,8 +223,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
             Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K4);
             //mw->texTile = DisTile__to_texture(mw->app->disTile);
-            RealTile__texture_dealloc(mw->app->realTile);
-            RealTile__texture_create(mw->app->realTile);
+            RealTile__texture_generate(mw->app->realTile);
         }
 
         if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(1)) {
@@ -243,8 +242,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
             Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K8);
             //mw->texTile = DisTile__to_texture(mw->app->disTile);
-            RealTile__texture_dealloc(mw->app->realTile);
-            RealTile__texture_create(mw->app->realTile);
+            RealTile__texture_generate(mw->app->realTile);
         }
 
 
@@ -292,12 +290,8 @@ void MapWidget__update_tile2(MapWidget* mw, const RealTile::Data& lower, const R
                             const std::vector<std::pair<int, RealTile::Data>>& steps) {
     START_BENCH(MapWidget__update_tile2)
 
-    if(mw->app->realTile->tex != NULL) {
-        RealTile__texture_dealloc(mw->app->realTile);
-    }
-
     Topographer__interpret(mw->app->realTile, lower, upper, steps);
-    RealTile__texture_create(mw->app->realTile);
+    RealTile__texture_generate(mw->app->realTile);
 
     STOP_BENCH(MapWidget__update_tile2)
 
