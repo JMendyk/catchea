@@ -85,6 +85,7 @@ static inline ImVec2 operator*(const ImVec2& lhs, const float& rat) { return ImV
 static inline ImVec2 operator*(const float& rat, const ImVec2& rhs) { return ImVec2(rhs.x*rat, rhs.y*rat); }
 static inline ImVec2 operator*(const ImVec2& lhs, const ImVec2& rhs) { return ImVec2(lhs.x*rhs.x, lhs.y*rhs.y); }
 static inline ImVec2 operator/(const ImVec2& lhs, const float& rat) { return ImVec2(lhs.x/rat, lhs.y/rat); }
+static inline ImVec2 operator/(const ImVec2& lhs, const ImVec2& rhs) { return ImVec2(lhs.x/rhs.x, lhs.y/rhs.y); }
 
 void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& window_size) {
     ImGuiWindowFlags window_flags = 0
@@ -104,11 +105,19 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
         ImVec2 scrolling = ImVec2(0.0f, 0.0f);
         //const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->texTile.heights, (ImGui::GetContentRegionAvail().y)/mw->texTile.heights);
-        const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height, (ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height);
+        const ImVec2 scroll_bound1 = ImVec2((ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height, (ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height);
+        const ImVec2 scroll_bound2 = ImVec2((ImGui::GetContentRegionAvail().x)/mw->app->realTile->tex->width, (ImGui::GetContentRegionAvail().x)/mw->app->realTile->tex->width);
+        const ImVec2 scroll_bound = scroll_bound1.x > scroll_bound2.x ? scroll_bound1 : scroll_bound2;
         static ImVec2 scale = scroll_bound;
         static bool is_dragging = false;
 
         ImVec2 initial_scale = scale;
+
+        //ImVec2 image_size = ImVec2(mw->texTile.width * scale.x, mw->texTile.heights * scale.y);
+        ImVec2 image_size = ImVec2(mw->app->realTile->tex->width * scale.x, mw->app->realTile->tex->height * scale.y);
+
+        //ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
+        ImGui::Image((ImTextureID)mw->app->realTile->tex->texture_id, image_size);
 
         if ((ImGui::IsWindowHovered() || is_dragging) && !ImGui::IsAnyItemActive()) {
             if(ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftArrow))) {
@@ -160,22 +169,17 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
                 }
             }
 
-            scale.x = fmaxf(scale.x, scroll_bound.x);
-            scale.y = fmaxf(scale.y, scroll_bound.y);
         }
 
-        //ImVec2 image_size = ImVec2(mw->texTile.width * scale.x, mw->texTile.heights * scale.y);
-        ImVec2 image_size = ImVec2(mw->app->realTile->tex->width * scale.x, mw->app->realTile->tex->height * scale.y);
-
-        //ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
-        ImGui::Image((ImTextureID)mw->app->realTile->tex->texture_id, image_size);
+        scale.x = fmaxf(scale.x, scroll_bound.x);
+        scale.y = fmaxf(scale.y, scroll_bound.y);
 
         ImVec2 center_point = (ImGui::GetIO().MousePos - ImGui::GetWindowPos());
 
         ImVec2 old_offset = ImVec2(ImGui::GetScrollX(), ImGui::GetScrollY());
         ImVec2 old_offset_centered = old_offset + center_point;
 
-        float scale_change = scale.x / initial_scale.x;
+        ImVec2 scale_change = scale / initial_scale;
 
         ImVec2 new_offset_centered = old_offset_centered * scale_change;
 
@@ -223,7 +227,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             RealTile__texture_create(mw->app->realTile);
         }
 
-        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(0)) {
+        if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) && ImGui::IsMouseReleased(1)) {
             srand(1);
             // Updates existing DisTile instead of creating new one
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
