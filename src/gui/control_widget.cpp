@@ -11,6 +11,7 @@
 #include <dis_tile/dis_tile.h>
 #include <imgui_internal.h>
 #include <dis_interpreters/catchmenter.h>
+#include <dis_interpreters/topographer.h>
 
 #include "geo_tile/geo_tile.h"
 #include "dis_tile/dis_tile.h"
@@ -47,22 +48,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
 
         float column_margin = 2 * ImGui::GetStyle().ItemSpacing.x;
 
-        static const RealTile::Coloring steps_lower = {000, 000, 000, 255};
-        static const RealTile::Coloring steps_upper = {000, 000, 000, 255};
-
-        static const std::vector<RealTileSample> preset_color = {
-                { 0000, {000, 000, 255, 255} },
-                { 0000, {000, 255, 000, 255} },
-                { 0300, {255, 255, 000, 255} },
-                { 2000, {255, 000, 000, 255} },
-        };
-
-        static const std::vector<RealTileSample> preset_black_and_white = {
-                { 0000, { 000, 000, 000, 255 } },
-                { 2000, { 255, 255, 255, 255 } },
-        };
-
-        static std::vector<RealTileSample> steps = preset_color;
+        static std::vector<RealTileSample> steps = REALTILE_PRESET_COLOR;
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
                             ImVec2(ImGui::GetStyle().ItemSpacing.x, 2 * ImGui::GetStyle().ItemSpacing.y));
@@ -74,11 +60,11 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         ImGui::Columns(2, NULL, false);
 
         if (ImGui::Button("Black and White", ImVec2(ImGui::GetColumnWidth() - column_margin/2, 0))) {
-            steps = preset_black_and_white;
+            steps = REALTILE_PRESET_BLACK_AND_WHITE;
         }
         ImGui::NextColumn();
         if (ImGui::Button("Standard Colors", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            steps = preset_color;
+            steps = REALTILE_PRESET_COLOR;
         }
 
         ImGui::Columns(1);
@@ -171,7 +157,8 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         ImGui::NextColumn();
 
         if (ImGui::Button("Start coloring", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            MapWidget__update_tile2(cw->app->mapWidget, steps_lower, steps_upper, steps);
+            Topographer__interpret(cw->app->realTile, REALTILE_DEFAULT_COLORING_LOWER, REALTILE_DEFAULT_COLORING_UPPER, steps);
+            RealTile__texture_generate(cw->app->realTile);
         }
 
         ImGui::Separator();

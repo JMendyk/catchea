@@ -21,13 +21,13 @@ bool MenuWidget__init(MenuWidget* mw, struct App* app) {
     mw->app = app;
     mw->btn_tex_open = rm_load_texture("res/assets/ic_folder_open_black_48dp.png");
     mw->btn_tex_tile = rm_load_texture("res/assets/ic_border_outer_black_48dp.png");
-    mw->btn_tex_topo = rm_load_texture("res/assets/ic_terrain_black_48dp.png");
-    mw->btn_tex_catch = rm_load_texture("res/assets/ic_opacity_black_48dp.png");
+    //mw->btn_tex_topo = rm_load_texture("res/assets/ic_terrain_black_48dp.png");
+    //mw->btn_tex_catch = rm_load_texture("res/assets/ic_opacity_black_48dp.png");
 
     return true;
 }
 
-void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& window_size) {
+void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& window_size, const ImVec2& popup_pos, const ImVec2& popup_size) {
     ImGuiWindowFlags window_flags = 0
         | ImGuiWindowFlags_NoTitleBar
         | ImGuiWindowFlags_NoResize
@@ -44,7 +44,7 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
 
         static ImGuiFs::Dialog dlg;
 
-        const char* filename = dlg.chooseFileDialog(btn_open, NULL, ".hgt");
+        const char* filename = dlg.chooseFileDialog(btn_open, NULL, ".hgt", NULL, popup_size, popup_pos);
         if(strlen(filename) > 0) {
             fprintf(stderr, "File picked: %s\n", filename);
             App_file_open_request(mw->app, filename);
@@ -59,17 +59,17 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
         ImGui::VerticalSeparator();
         ImGui::SameLine();
 
-        if(ImGui::ImageButton((ImTextureID)mw->btn_tex_topo.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0)) {
-            (mw->app)->mapWidget->is_color = 1 - (mw->app)->mapWidget->is_color;
-            MapWidget__update_tile((mw->app)->mapWidget);
-        }
-        ImGui::SameLine();
+        //if(ImGui::ImageButton((ImTextureID)mw->btn_tex_topo.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0)) {
+        //    (mw->app)->mapWidget->is_color = 1 - (mw->app)->mapWidget->is_color;
+        //    MapWidget__update_tile((mw->app)->mapWidget);
+        //}
+        //ImGui::SameLine();
 
-        ImGui::ImageButton((ImTextureID)mw->btn_tex_catch.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0);
-        ImGui::SameLine();
-
-        ImGui::VerticalSeparator();
-        ImGui::SameLine();
+        //ImGui::ImageButton((ImTextureID)mw->btn_tex_catch.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0);
+        //ImGui::SameLine();
+        //
+        //ImGui::VerticalSeparator();
+        //ImGui::SameLine();
     }
     ImGui::End();
 }
@@ -77,8 +77,8 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
 bool MenuWidget__terminate(MenuWidget* mw) {
     rm_free_texture(mw->btn_tex_open);
     rm_free_texture(mw->btn_tex_tile);
-    rm_free_texture(mw->btn_tex_topo);
-    rm_free_texture(mw->btn_tex_catch);
+    //rm_free_texture(mw->btn_tex_topo);
+    //rm_free_texture(mw->btn_tex_catch);
 
     return true;
 }

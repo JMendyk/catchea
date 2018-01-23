@@ -48,7 +48,7 @@ bool MenuWidget__init(MenuWidget* mw, App* app);
  * @param [in] window_size size of MenuWidget window
  * @memberof MenuWidget
  */
-void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& window_size);
+void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& window_size, const ImVec2& popup_pos, const ImVec2& popup_size);
 
 /**
  * Terminate MenuWidget before the application terminates

@@ -25,22 +25,22 @@ MapWidget* MapWidget__create() {
     return mw;
 }
 
-inline bool loadGeoTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
-    START_BENCH(map_load)
-
-    mw->app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", lat_min, lon_min, lat_max, lon_max);
-    if(!mw->app->geoTile)
-        return false;
-
-    MapWidget__update_tile(mw, { 000, 000, 000, 255 }, { 255, 000, 000, 255 }, {
-        std::make_pair((DisTileSample){ 000, 000, 000, 255 },      0),
-        std::make_pair((DisTileSample){ 255, 255, 255, 255 },   2000)
-    });
-
-    STOP_BENCH(map_load)
-
-    fprintf(stderr, "Total load time: %.2lf\n", GET_BENCH(map_load));
-}
+//inline bool loadGeoTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
+//    START_BENCH(map_load)
+//
+//    mw->app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", lat_min, lon_min, lat_max, lon_max);
+//    if(!mw->app->geoTile)
+//        return false;
+//
+//    MapWidget__update_tile(mw, { 000, 000, 000, 255 }, { 255, 000, 000, 255 }, {
+//        std::make_pair((DisTileSample){ 000, 000, 000, 255 },      0),
+//        std::make_pair((DisTileSample){ 255, 255, 255, 255 },   2000)
+//    });
+//
+//    STOP_BENCH(map_load)
+//
+//    fprintf(stderr, "Total load time: %.2lf\n", GET_BENCH(map_load));
+//}
 
 inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
     START_BENCH(map_load)
@@ -49,10 +49,7 @@ inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, 
     if(!mw->app->realTile)
         return false;
 
-    MapWidget__update_tile2(mw, (RealTile::Coloring){ 000, 000, 000, 255 }, (RealTile::Coloring){ 255, 000, 000, 255 }, {
-            { 0000, { 000, 000, 000, 255 } },
-            { 2000, { 255, 255, 255, 255 } },
-    });
+    RealTile__apply_default_coloring(mw->app->realTile);
 
     STOP_BENCH(map_load)
 
@@ -274,43 +271,43 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
     ImGui::PopStyleVar(2);
 }
 
-void MapWidget__update_tile(MapWidget* mw) {
-    if(mw->app->disTile != NULL) {
-        rm_free_texture(mw->texTile);
-        DisTile__destroy(mw->app->disTile);
-    }
-    mw->app->disTile = Topographer__interpret(mw->app->geoTile, mw->is_color);
-    mw->texTile = DisTile__to_texture(mw->app->disTile);
-}
+//void MapWidget__update_tile(MapWidget* mw) {
+//    if(mw->app->disTile != NULL) {
+//        rm_free_texture(mw->texTile);
+//        DisTile__destroy(mw->app->disTile);
+//    }
+//    mw->app->disTile = Topographer__interpret(mw->app->geoTile, mw->is_color);
+//    mw->texTile = DisTile__to_texture(mw->app->disTile);
+//}
+//
+//void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
+//                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps) {
+//    START_BENCH(MapWidget__update_tile)
+//
+//    if(mw->app->disTile != NULL) {
+//        rm_free_texture(mw->texTile);
+//        DisTile__destroy(mw->app->disTile);
+//    }
+//
+//    mw->app->disTile = Topographer__interpret_param(mw->app->geoTile, lower, upper, steps);
+//    mw->texTile = DisTile__to_texture(mw->app->disTile);
+//
+//    STOP_BENCH(MapWidget__update_tile)
+//
+//    fprintf(stderr, "MapWidget__update_tile %.2lf\n", GET_BENCH(MapWidget__update_tile));
+//}
 
-void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
-                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps) {
-    START_BENCH(MapWidget__update_tile)
-
-    if(mw->app->disTile != NULL) {
-        rm_free_texture(mw->texTile);
-        DisTile__destroy(mw->app->disTile);
-    }
-
-    mw->app->disTile = Topographer__interpret_param(mw->app->geoTile, lower, upper, steps);
-    mw->texTile = DisTile__to_texture(mw->app->disTile);
-
-    STOP_BENCH(MapWidget__update_tile)
-
-    fprintf(stderr, "MapWidget__update_tile %.2lf\n", GET_BENCH(MapWidget__update_tile));
-}
-
-void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
-                            const std::vector<RealTileSample>& steps) {
-    START_BENCH(MapWidget__update_tile2)
-
-    Topographer__interpret(mw->app->realTile, lower, upper, steps);
-    RealTile__texture_generate(mw->app->realTile);
-
-    STOP_BENCH(MapWidget__update_tile2)
-
-    fprintf(stderr, "MapWidget__update_tile2 %.2lf\n", GET_BENCH(MapWidget__update_tile2));
-}
+//void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
+//                            const std::vector<RealTileSample>& steps) {
+//    START_BENCH(MapWidget__update_tile2)
+//
+//    Topographer__interpret(mw->app->realTile, lower, upper, steps);
+//    RealTile__texture_generate(mw->app->realTile);
+//
+//    STOP_BENCH(MapWidget__update_tile2)
+//
+//    fprintf(stderr, "MapWidget__update_tile2 %.2lf\n", GET_BENCH(MapWidget__update_tile2));
+//}
 
 bool MapWidget__terminate(MapWidget* mw) {
     rm_free_texture(mw->texTile);

@@ -12,6 +12,22 @@
 #include <GL/gl.h>
 #include <resource_manager.h>
 #include <cstdio>
+#include <dis_interpreters/topographer.h>
+
+const RealTile::Coloring REALTILE_DEFAULT_COLORING_LOWER = {000, 000, 000, 255};
+const RealTile::Coloring REALTILE_DEFAULT_COLORING_UPPER = {000, 000, 000, 255};
+
+const std::vector<RealTileSample> REALTILE_PRESET_COLOR = {
+        { 0000, {000, 000, 255, 255} },
+        { 0000, {000, 255, 000, 255} },
+        { 0300, {255, 255, 000, 255} },
+        { 2000, {255, 000, 000, 255} },
+};
+
+const std::vector<RealTileSample> REALTILE_PRESET_BLACK_AND_WHITE = {
+        { 0000, { 000, 000, 000, 255 } },
+        { 2000, { 255, 255, 255, 255 } },
+};
 
 bool operator==(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs) {
     return lhs.red == rhs.red
@@ -226,4 +242,9 @@ bool RealTile__texture_generate(RealTile *tile) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_alignment);
 
     return true;
+}
+
+bool RealTile__apply_default_coloring(RealTile* tile) {
+    Topographer__interpret(tile, REALTILE_DEFAULT_COLORING_LOWER, REALTILE_DEFAULT_COLORING_UPPER, REALTILE_PRESET_COLOR);
+    RealTile__texture_generate(tile);
 }

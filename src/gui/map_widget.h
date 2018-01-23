@@ -60,13 +60,13 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
  * Update information regarding loaded tile
  * @param mw MapWidget to receive signal
  */
-void MapWidget__update_tile(MapWidget* mw);
+//void MapWidget__update_tile(MapWidget* mw);
+//
+//void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
+//                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
 
-void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
-                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
-
-void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
-                            const std::vector<RealTileSample>& steps);
+//void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
+//                            const std::vector<RealTileSample>& steps);
 
 /**
  * Terminate MapWidget before the application terminates

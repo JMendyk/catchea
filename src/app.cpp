@@ -8,6 +8,7 @@
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
+#include <real_tile/hgt_plugin.h>
 
 #include "gui/menu_widget.h"
 #include "gui/map_widget.h"
@@ -126,20 +127,7 @@ void App__render(App* app) {
     static int control_widget_width = 300;
 
     /*
-     * Menu Widget
-     */
-    const ImVec2 menu_widget_pos = ImVec2(
-        ui_margin,
-        ui_margin
-    );
-    const ImVec2 menu_widget_size = ImVec2(
-        canvas_w - 2*ui_margin - control_widget_width - ui_margin,
-        menu_widget_height
-    );
-    MenuWidget__render(app->menuWidget, menu_widget_pos, menu_widget_size);
-
-    /*
-     * Menu Widget
+     * Map Widget
      */
     const ImVec2 map_widget_pos = ImVec2(
         ui_margin,
@@ -150,6 +138,19 @@ void App__render(App* app) {
         canvas_h - (ui_margin + menu_widget_height + ui_margin + 0 + ui_margin + footer_widget_height)
     );
     MapWidget__render(app->mapWidget, map_widget_pos, map_widget_size);
+
+    /*
+     * Menu Widget
+     */
+    const ImVec2 menu_widget_pos = ImVec2(
+            ui_margin,
+            ui_margin
+    );
+    const ImVec2 menu_widget_size = ImVec2(
+            canvas_w - 2*ui_margin - control_widget_width - ui_margin,
+            menu_widget_height
+    );
+    MenuWidget__render(app->menuWidget, menu_widget_pos, menu_widget_size, map_widget_pos, map_widget_size);
 
     /*
      * Control Widget
@@ -180,9 +181,13 @@ void App__render(App* app) {
 }
 
 void App_file_open_request(App* app, const char* filename) {
-    app->geoTile = GeoTile__from_hgt_file(filename);
+    //app->geoTile = GeoTile__from_hgt_file(filename);
+    //
+    //MapWidget__update_tile(app->mapWidget);
 
-    MapWidget__update_tile(app->mapWidget);
+    RealTile__destroy(app->realTile);
+    app->realTile = RealTile__from_hgt_file(filename);
+    RealTile__apply_default_coloring(app->realTile);
 }
 
 bool App__terminate(App* app) {

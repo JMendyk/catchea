@@ -7,6 +7,8 @@
 #ifndef CATCHEA_REAL_TILE_H
 #define CATCHEA_REAL_TILE_H
 
+#include <vector>
+
 struct Texture;
 
 struct RealTile {
@@ -32,6 +34,12 @@ struct RealTileSample {
     RealTile::Coloring coloring;
 };
 
+extern const RealTile::Coloring REALTILE_DEFAULT_COLORING_LOWER;
+extern const RealTile::Coloring REALTILE_DEFAULT_COLORING_UPPER;
+
+extern const std::vector<RealTileSample> REALTILE_PRESET_COLOR;
+extern const std::vector<RealTileSample> REALTILE_PRESET_BLACK_AND_WHITE;
+
 bool operator==(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs);
 bool operator!=(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs);
 
@@ -51,6 +59,8 @@ bool RealTile__texture_alloc(RealTile* tile);
 bool RealTile__texture_dealloc(RealTile* tile);
 
 bool RealTile__texture_generate(RealTile *tile);
+
+bool RealTile__apply_default_coloring(RealTile* tile);
 
 void RealTile__destroy(RealTile* tile);
 
