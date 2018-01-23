@@ -98,7 +98,7 @@ DisTile* Catchmenter__color_pixel(const GeoTile* geo_tile, DisTile* dis_tile, co
     DisTileSample same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
     dis_tile->data[CORD(x, y, dis_tile->tile->width)] = same_color;
 
-    fprintf(stderr, "local minima: %lu\n", q.size());
+    //fprintf(stderr, "local minima: %lu\n", q.size());
 
     while(!q.empty()) {
         auto xpos = q.front();
@@ -150,7 +150,7 @@ DisTile* Catchmenter__color_all(const GeoTile* geo_tile, DisTile* dis_tile, cons
         }
     }
 
-    fprintf(stderr, "local minima: %lu\n", q.size());
+    //fprintf(stderr, "local minima: %lu\n", q.size());
 
     while(!q.empty()) {
         auto xpos = q.front();
@@ -205,7 +205,7 @@ DisTile* Catchmenter__color_all_immediate(const GeoTile* geo_tile, DisTile* dis_
             DisTileSample same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
             dis_tile->data[CORD(px, py, dis_tile->tile->width)] = same_color;
 
-            fprintf(stderr, "local minimum (%d, %d)\n", px, py);
+            //fprintf(stderr, "local minimum (%d, %d)\n", px, py);
 
             while(!q.empty()) {
                 auto xpos = q.front();
@@ -256,7 +256,7 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
     RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
     tile->coloring[CORD(x, y, tile->width)] = same_color;
 
-    fprintf(stderr, "local minima: %lu\n", q.size());
+    //fprintf(stderr, "local minima: %lu\n", q.size());
 
     while(!q.empty()) {
         auto xpos = q.front();
@@ -287,9 +287,9 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
 }
 
 void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, const int& from_y, const Kernel& kernel) {
-    START_BENCH(catchmenter)
-
-    fprintf(stderr, "Kernel %d with%s HM\n", kernel.count, kernel.hard_min ? "": "out");
+    //START_BENCH(catchmenter)
+    //
+    //fprintf(stderr, "Kernel %d with%s HM\n", kernel.count, kernel.hard_min ? "": "out");
 
     std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
 
@@ -320,8 +320,8 @@ void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, con
                 continue;
 
             if(!visi_matrix[CORD(nx, ny, tile->width)]) {
-                visi_matrix[CORD(nx, ny, tile->width)] = true;
                 if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
+                    visi_matrix[CORD(nx, ny, tile->width)] = true;
                     tile->coloring[CORD(nx, ny, tile->width)] = color;
                     q.push(std::make_pair(std::make_pair(nx, ny), color));
                 }
@@ -329,9 +329,9 @@ void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, con
         }
     }
 
-    STOP_BENCH(catchmenter)
-
-    fprintf(stderr, "Catchmented from (%d, %d) in %lf\n", from_x, from_y, GET_BENCH(catchmenter));
+    //STOP_BENCH(catchmenter)
+    //
+    //fprintf(stderr, "Catchmented from (%d, %d) in %lf\n", from_x, from_y, GET_BENCH(catchmenter));
 }
 
 void Catchmenter__all(RealTile* tile, const Kernel& kernel) {
@@ -346,16 +346,16 @@ void Catchmenter__all(RealTile* tile, const Kernel& kernel) {
         it = 0;
     }
 
-    int minimums_left = 50000;
+    int minimums_left = tile->height * tile->width;//50000;
 
     for(; it < (tile->height * tile->width); it++) {
         int px = (int)FROM_CORD_X(it, tile->width);
         int py = (int)FROM_CORD_Y(it, tile->width);
 
         if(is_local_minimum(tile, px, py, kernel)) {
-            if(visi_matrix[CORD(px, py, tile->width)]) {
-                fprintf(stderr, "oppps... %d %d\n", px, py);
-            }
+            //if(visi_matrix[CORD(px, py, tile->width)]) {
+            //    fprintf(stderr, "oppps... %d %d\n", px, py);
+            //}
             Catchmenter__from(tile, visi_matrix, px, py, kernel);
             minimums_left--;
 
@@ -398,7 +398,7 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
         }
     }
 
-    fprintf(stderr, "local minima: %lu\n", q.size());
+    //fprintf(stderr, "local minima: %lu\n", q.size());
 
     while(!q.empty()) {
         auto xpos = q.front();
@@ -453,7 +453,7 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
             RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
             tile->coloring[CORD(px, py, tile->width)] = same_color;
 
-            fprintf(stderr, "local minimum (%d, %d)\n", px, py);
+            //fprintf(stderr, "local minimum (%d, %d)\n", px, py);
 
             while(!q.empty()) {
                 auto xpos = q.front();
