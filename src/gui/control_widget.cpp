@@ -370,6 +370,15 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                 catchmented = true;
                 Catchmenter__color_all_immediate(cw->app->realTile, K4_HARD_MIN);
             }
+            if (ImGui::Button("Catch4 heightwise")) {
+                catchmented = true;
+                Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K4);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Catch4 HM heightwise")) {
+                catchmented = true;
+                Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K4_HARD_MIN);
+            }
 
             ImGui::Separator();
 
@@ -390,6 +399,15 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
             if (ImGui::Button("Catch8 HM immediate")) {
                 catchmented = true;
                 Catchmenter__color_all_immediate(cw->app->realTile, K8_HARD_MIN);
+            }
+            if (ImGui::Button("Catch8 heightwise")) {
+                catchmented = true;
+                Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K8);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Catch8 HM heightwise")) {
+                catchmented = true;
+                Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K8_HARD_MIN);
             }
 
             if (catchmented) {

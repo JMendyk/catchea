@@ -394,3 +394,84 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
 
     fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
 }
+
+void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& kernel) {
+    START_BENCH(catchmenter)
+
+    struct Elem {
+        signed short height;
+        std::pair<int, int> pos;
+        RealTile::Data coloring;
+
+        bool operator<(const Elem& other) const {
+            return height > other.height;
+        }
+    };
+
+    std::priority_queue<Elem> local_minimum_q;
+
+    RealTile::Data white = {255, 255, 255, 255};
+
+    for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
+        int px = (int)FROM_CORD_X(it, tile->width);
+        int py = (int)FROM_CORD_Y(it, tile->width);
+
+        tile->coloring[CORD(px, py, tile->width)] = white;
+    }
+
+    for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
+        int px = (int)FROM_CORD_X(it, tile->width);
+        int py = (int)FROM_CORD_Y(it, tile->width);
+
+        if(is_local_minimum(tile, px, py, kernel)) {
+            RealTile::Data my_color = RealTile__random_color();
+            local_minimum_q.push((Elem){ tile->heights[CORD(px, py, tile->width)], std::make_pair(px, py), my_color });
+
+            RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+            tile->coloring[CORD(px, py, tile->width)] = same_color;
+
+            //fprintf(stderr, "local minimum (%d, %d)\n", px, py);
+        }
+    }
+
+    while(!local_minimum_q.empty()) {
+        auto starter = local_minimum_q.top();
+        local_minimum_q.pop();
+
+        RealTile::Data same_color = { starter.coloring.red * 0.5f, starter.coloring.green * 0.5f, starter.coloring.blue * 0.5f, 255 };
+        if(tile->coloring[CORD(starter.pos.first, starter.pos.second, tile->width)] != same_color) {
+            // already visited... but why?
+            fprintf(stderr, "why???\n");
+            continue;
+        }
+
+        std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+        q.push(std::make_pair(starter.pos, starter.coloring));
+
+        while(!q.empty()) {
+            auto xpos = q.front();
+            auto pos = xpos.first;
+            auto color = xpos.second;
+            q.pop();
+
+            for(int i = 0; i < kernel.count; i++) {
+                int nx = pos.first + kernel.dx[i];
+                int ny = pos.second + kernel.dy[i];
+
+                if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+                    continue;
+
+                if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
+                    if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
+                        tile->coloring[CORD(nx, ny, tile->width)] = color;
+                        q.push(std::make_pair(std::make_pair(nx, ny), color));
+                    }
+                }
+            }
+        }
+    }
+
+    STOP_BENCH(catchmenter)
+
+    fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
+}

@@ -38,5 +38,7 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel);
 
 void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel);
 
+void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& kernel);
+
 
 #endif //CATCHEA_CATCHMENTER_H
