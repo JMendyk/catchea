@@ -13,18 +13,18 @@
 #include <resource_manager.h>
 #include <cstdio>
 
-bool operator==(const RealTile::Data& lhs, const RealTile::Data& rhs) {
+bool operator==(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs) {
     return lhs.red == rhs.red
            && lhs.green == rhs.green
            && lhs.blue == rhs.blue
            && lhs.alpha == rhs.alpha;
 }
 
-bool operator!=(const RealTile::Data& lhs, const RealTile::Data& rhs) {
+bool operator!=(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs) {
     return !(lhs == rhs);
 }
 
-RealTile::Data RealTile__random_color() {
+RealTile::Coloring RealTile__random_color() {
     return {
             (unsigned char) (rand() % 256),
             (unsigned char) (rand() % 256),
@@ -80,7 +80,7 @@ bool RealTile__data_alloc(RealTile* tile, int height, int width) {
     tile->height = height;
     tile->width = width;
     size_t size = static_cast<size_t>(height * width);
-    tile->coloring = (RealTile::Data*) calloc(size, sizeof(RealTile::Data));
+    tile->coloring = (RealTile::Coloring*) calloc(size, sizeof(RealTile::Coloring));
     tile->heights = (signed short*) calloc(size, sizeof(signed short));
 
     return tile->coloring != NULL && tile->heights != NULL;
@@ -91,7 +91,7 @@ void RealTile__data_place(RealTile* tile, RealTile* place_tile, int place_y, int
     int data_offset = 0;
 
     for (int v_pos = 0; v_pos < place_tile->height; v_pos++) {
-        memcpy(tile->coloring + tile_offset, place_tile->coloring + data_offset, place_tile->width * sizeof(RealTile::Data));
+        memcpy(tile->coloring + tile_offset, place_tile->coloring + data_offset, place_tile->width * sizeof(RealTile::Coloring));
         memcpy(tile->heights + tile_offset, place_tile->heights + data_offset, place_tile->width * sizeof(signed short));
         tile_offset += tile->width;
         data_offset += place_tile->width;

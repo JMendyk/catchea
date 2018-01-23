@@ -15,7 +15,7 @@ struct RealTile {
 
     int height, width;
 
-    struct Data {
+    struct Coloring {
         unsigned char red;
         unsigned char green;
         unsigned char blue;
@@ -27,10 +27,10 @@ struct RealTile {
     Texture* tex;
 };
 
-bool operator==(const RealTile::Data& lhs, const RealTile::Data& rhs);
-bool operator!=(const RealTile::Data& lhs, const RealTile::Data& rhs);
+bool operator==(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs);
+bool operator!=(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs);
 
-RealTile::Data RealTile__random_color();
+RealTile::Coloring RealTile__random_color();
 
 RealTile* RealTile__create(int lat, int lon, int lat_size, int lon_size);
 

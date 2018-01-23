@@ -49,9 +49,9 @@ inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, 
     if(!mw->app->realTile)
         return false;
 
-    MapWidget__update_tile2(mw, (RealTile::Data){ 000, 000, 000, 255 }, (RealTile::Data){ 255, 000, 000, 255 }, {
-        std::pair<int, RealTile::Data>(0000, { 000, 000, 000, 255 }),
-        std::pair<int, RealTile::Data>(2000, { 255, 255, 255, 255 })
+    MapWidget__update_tile2(mw, (RealTile::Coloring){ 000, 000, 000, 255 }, (RealTile::Coloring){ 255, 000, 000, 255 }, {
+        std::pair<int, RealTile::Coloring>(0000, { 000, 000, 000, 255 }),
+        std::pair<int, RealTile::Coloring>(2000, { 255, 255, 255, 255 })
     });
 
     STOP_BENCH(map_load)
@@ -300,8 +300,8 @@ void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const Dis
     fprintf(stderr, "MapWidget__update_tile %.2lf\n", GET_BENCH(MapWidget__update_tile));
 }
 
-void MapWidget__update_tile2(MapWidget* mw, const RealTile::Data& lower, const RealTile::Data& upper,
-                            const std::vector<std::pair<int, RealTile::Data>>& steps) {
+void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
+                            const std::vector<std::pair<int, RealTile::Coloring>>& steps) {
     START_BENCH(MapWidget__update_tile2)
 
     Topographer__interpret(mw->app->realTile, lower, upper, steps);

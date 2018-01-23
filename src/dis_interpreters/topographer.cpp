@@ -139,7 +139,7 @@ DisTile* Topographer__interpret_param(GeoTile* geo_tile, const DisTileSample& lo
     return dis_tile;
 }
 
-inline RealTile::Data sample_gradient(const RealTile::Data& start, const RealTile::Data& finish, const float& grad_norm) {
+inline RealTile::Coloring sample_gradient(const RealTile::Coloring& start, const RealTile::Coloring& finish, const float& grad_norm) {
     //assert(grad_norm >= 0);
     return {
         (unsigned char) (start.red + grad_norm*(finish.red - start.red)),
@@ -150,9 +150,9 @@ inline RealTile::Data sample_gradient(const RealTile::Data& start, const RealTil
 }
 
 void Topographer__interpret(RealTile* real_tile,
-                            const RealTile::Data &lower,
-                            const RealTile::Data &upper,
-                            const std::vector<std::pair<int, RealTile::Data>> &steps) {
+                            const RealTile::Coloring &lower,
+                            const RealTile::Coloring &upper,
+                            const std::vector<std::pair<int, RealTile::Coloring>> &steps) {
     //START_BENCH(interpret_color)
 
     for(size_t it = 0; it <= (real_tile->height * real_tile->width); it++) {

@@ -240,9 +240,9 @@ DisTile* Catchmenter__color_all_immediate(const GeoTile* geo_tile, DisTile* dis_
 void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const Kernel& kernel) {
     START_BENCH(catchmenter)
 
-    std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+    std::queue<std::pair<std::pair<int, int>, RealTile::Coloring>> q;
 
-    RealTile::Data white = {255, 255, 255, 255};
+    RealTile::Coloring white = {255, 255, 255, 255};
 
     for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
         int px = (int)FROM_CORD_X(it, tile->width);
@@ -250,10 +250,10 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
         tile->coloring[CORD(px, py, tile->width)] = white;
     }
 
-    RealTile::Data my_color = RealTile__random_color();
+    RealTile::Coloring my_color = RealTile__random_color();
     q.push(std::make_pair(std::make_pair(x, y), my_color));
 
-    RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+    RealTile::Coloring same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
     tile->coloring[CORD(x, y, tile->width)] = same_color;
 
     //fprintf(stderr, "local minima: %lu\n", q.size());
@@ -291,13 +291,13 @@ void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, con
     //
     //fprintf(stderr, "Kernel %d with%s HM\n", kernel.count, kernel.hard_min ? "": "out");
 
-    std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+    std::queue<std::pair<std::pair<int, int>, RealTile::Coloring>> q;
 
-    RealTile::Data my_color = RealTile__random_color();
+    RealTile::Coloring my_color = RealTile__random_color();
     q.push(std::make_pair(std::make_pair(from_x, from_y), my_color));
     visi_matrix[CORD(from_x, from_y, tile->width)] = true;
 
-    RealTile::Data same_color = {
+    RealTile::Coloring same_color = {
             (unsigned char) (my_color.red * 0.5f),
             (unsigned char) (my_color.green * 0.5f),
             (unsigned char) (my_color.blue * 0.5f),
@@ -379,9 +379,9 @@ void Catchmenter__all(RealTile* tile, const Kernel& kernel) {
 void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
     START_BENCH(catchmenter)
 
-    std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+    std::queue<std::pair<std::pair<int, int>, RealTile::Coloring>> q;
 
-    RealTile::Data white = {255, 255, 255, 255};
+    RealTile::Coloring white = {255, 255, 255, 255};
 
     for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
         int px = (int)FROM_CORD_X(it, tile->width);
@@ -390,10 +390,10 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
         tile->coloring[CORD(px, py, tile->width)] = white;
 
         if(is_local_minimum(tile, px, py, kernel)) {
-            RealTile::Data my_color = RealTile__random_color();
+            RealTile::Coloring my_color = RealTile__random_color();
             q.push(std::make_pair(std::make_pair(px, py), my_color));
 
-            RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+            RealTile::Coloring same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
             tile->coloring[CORD(px, py, tile->width)] = same_color;
         }
     }
@@ -431,9 +431,9 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
 void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
     START_BENCH(catchmenter)
 
-    std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+    std::queue<std::pair<std::pair<int, int>, RealTile::Coloring>> q;
 
-    RealTile::Data white = {255, 255, 255, 255};
+    RealTile::Coloring white = {255, 255, 255, 255};
 
     for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
         int px = (int)FROM_CORD_X(it, tile->width);
@@ -447,10 +447,10 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
         int py = (int)FROM_CORD_Y(it, tile->width);
 
         if(is_local_minimum(tile, px, py, kernel)) {
-            RealTile::Data my_color = RealTile__random_color();
+            RealTile::Coloring my_color = RealTile__random_color();
             q.push(std::make_pair(std::make_pair(px, py), my_color));
 
-            RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+            RealTile::Coloring same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
             tile->coloring[CORD(px, py, tile->width)] = same_color;
 
             //fprintf(stderr, "local minimum (%d, %d)\n", px, py);
@@ -491,7 +491,7 @@ void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& k
     struct Elem {
         signed short height;
         std::pair<int, int> pos;
-        RealTile::Data coloring;
+        RealTile::Coloring coloring;
 
         bool operator<(const Elem& other) const {
             return height > other.height;
@@ -500,7 +500,7 @@ void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& k
 
     std::priority_queue<Elem> local_minimum_q;
 
-    RealTile::Data white = {255, 255, 255, 255};
+    RealTile::Coloring white = {255, 255, 255, 255};
 
     for(size_t it = 0; it <= (tile->height * tile->width); it ++) {
         int px = (int)FROM_CORD_X(it, tile->width);
@@ -514,10 +514,10 @@ void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& k
         int py = (int)FROM_CORD_Y(it, tile->width);
 
         if(is_local_minimum(tile, px, py, kernel)) {
-            RealTile::Data my_color = RealTile__random_color();
+            RealTile::Coloring my_color = RealTile__random_color();
             local_minimum_q.push((Elem){ tile->heights[CORD(px, py, tile->width)], std::make_pair(px, py), my_color });
 
-            RealTile::Data same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
+            RealTile::Coloring same_color = { my_color.red * 0.5f, my_color.green * 0.5f, my_color.blue * 0.5f, 255  };
             tile->coloring[CORD(px, py, tile->width)] = same_color;
 
             //fprintf(stderr, "local minimum (%d, %d)\n", px, py);
@@ -528,14 +528,14 @@ void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& k
         auto starter = local_minimum_q.top();
         local_minimum_q.pop();
 
-        RealTile::Data same_color = { starter.coloring.red * 0.5f, starter.coloring.green * 0.5f, starter.coloring.blue * 0.5f, 255 };
+        RealTile::Coloring same_color = { starter.coloring.red * 0.5f, starter.coloring.green * 0.5f, starter.coloring.blue * 0.5f, 255 };
         if(tile->coloring[CORD(starter.pos.first, starter.pos.second, tile->width)] != same_color) {
             // already visited... but why?
             fprintf(stderr, "why???\n");
             continue;
         }
 
-        std::queue<std::pair<std::pair<int, int>, RealTile::Data>> q;
+        std::queue<std::pair<std::pair<int, int>, RealTile::Coloring>> q;
         q.push(std::make_pair(starter.pos, starter.coloring));
 
         while(!q.empty()) {

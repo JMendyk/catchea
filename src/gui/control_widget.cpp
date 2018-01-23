@@ -46,22 +46,22 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         ImGui::SetWindowSize(window_size, ImGuiCond_Always);
 
 
-        static const RealTile::Data steps_lower = {000, 000, 000, 255};
-        static const RealTile::Data steps_upper = {000, 000, 000, 255};
+        static const RealTile::Coloring steps_lower = {000, 000, 000, 255};
+        static const RealTile::Coloring steps_upper = {000, 000, 000, 255};
 
-        static const std::vector<std::pair<int, RealTile::Data>> preset_color = {
+        static const std::vector<std::pair<int, RealTile::Coloring>> preset_color = {
                 { 0000, {000, 000, 255, 255} },
                 { 0000, {000, 255, 000, 255} },
                 { 0300, {255, 255, 000, 255} },
                 { 2000, {255, 000, 000, 255} },
         };
 
-        static const std::vector<std::pair<int, RealTile::Data>> preset_black_and_white = {
+        static const std::vector<std::pair<int, RealTile::Coloring>> preset_black_and_white = {
                 { 0000, { 000, 000, 000, 255 } },
                 { 2000, { 255, 255, 255, 255 } },
         };
 
-        static std::vector<std::pair<int, RealTile::Data>> steps = preset_color;
+        static std::vector<std::pair<int, RealTile::Coloring>> steps = preset_color;
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
                             ImVec2(ImGui::GetStyle().ItemSpacing.x, 2 * ImGui::GetStyle().ItemSpacing.y));
@@ -75,7 +75,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
 
         float column_margin = 2 * ImGui::GetStyle().ItemSpacing.x;
 
-        typedef std::vector<std::pair<int, RealTile::Data>>::iterator iter;
+        typedef std::vector<std::pair<int, RealTile::Coloring>>::iterator iter;
         iter prev, next;
 
 
@@ -108,7 +108,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
             ImGui::NextColumn();
 
             {
-                RealTile::Data dts = step->second;
+                RealTile::Coloring dts = step->second;
                 float sc = 1.0f / 255.0f;
                 float color[3] = {sc * dts.red, sc * dts.green, sc * dts.blue};
                 ImGui::PushItemWidth(ImGui::GetColumnWidth()/* - column_margin*/);
