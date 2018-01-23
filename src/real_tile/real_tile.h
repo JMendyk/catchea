@@ -22,7 +22,7 @@ struct RealTile {
         unsigned char alpha;
     }* coloring;
 
-    int* heights;
+    signed short* heights;
 
     Texture* tex;
 };
@@ -39,13 +39,7 @@ bool RealTile__is_next_lat(const RealTile* first, const RealTile* next);
 bool RealTile__is_next_lon(const RealTile* first, const RealTile* next);
 
 bool RealTile__data_alloc(RealTile* tile, int height, int width);
-void RealTile__data_place(RealTile* tile,
-                          int height,
-                          int width,
-                          int* heights,
-                          RealTile::Data* data,
-                          int place_y,
-                          int place_x);
+void RealTile__data_place(RealTile* tile, RealTile* data, int place_y, int place_x);
 void RealTile__data_dealloc(RealTile* tile);
 
 bool RealTile__texture_alloc(RealTile* tile);

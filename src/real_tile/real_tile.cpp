@@ -81,26 +81,20 @@ bool RealTile__data_alloc(RealTile* tile, int height, int width) {
     tile->width = width;
     size_t size = static_cast<size_t>(height * width);
     tile->coloring = (RealTile::Data*) calloc(size, sizeof(RealTile::Data));
-    tile->heights = (int*) calloc(size, sizeof(int));
+    tile->heights = (signed short*) calloc(size, sizeof(signed short));
 
     return tile->coloring != NULL && tile->heights != NULL;
 }
 
-void RealTile__data_place(RealTile* tile,
-                          int height,
-                          int width,
-                          int* heights,
-                          RealTile::Data* data,
-                          int place_y,
-                          int place_x) {
+void RealTile__data_place(RealTile* tile, RealTile* place_tile, int place_y, int place_x) {
     int tile_offset = place_y * tile->width + place_x;
     int data_offset = 0;
 
-    for (int v_pos = 0; v_pos < height; v_pos++) {
-        memcpy(tile->coloring + tile_offset, data + data_offset, width * sizeof(RealTile::Data));
-        memcpy(tile->heights + tile_offset, heights + data_offset, width * sizeof(int));
+    for (int v_pos = 0; v_pos < place_tile->height; v_pos++) {
+        memcpy(tile->coloring + tile_offset, place_tile->coloring + data_offset, place_tile->width * sizeof(RealTile::Data));
+        memcpy(tile->heights + tile_offset, place_tile->heights + data_offset, place_tile->width * sizeof(signed short));
         tile_offset += tile->width;
-        data_offset += width;
+        data_offset += place_tile->width;
     }
 }
 
@@ -183,6 +177,7 @@ void RealTile__destroy(RealTile* tile) {
 }
 
 bool RealTile__texture_generate(RealTile *tile) {
+    glDeleteTextures(1, &tile->tex->texture_id);
 
     tile->tex->width = tile->width;
     tile->tex->height = tile->height;

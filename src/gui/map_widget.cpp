@@ -65,12 +65,16 @@ bool MapWidget__init(MapWidget* mw, App* app) {
 
     //49, 14, 54, 23
 
+    srand(time(NULL));
+
     int lat = rand() % (54-49+1) + 49;
     int lon = rand() % (23-14+1) + 14;
 
-    //loadRealTile(mw, lat, lon, lat, lon);
+    //loadRealTile(mw, lat, lon, lat+2, lon+2);
     //
     //loadGeoTile(mw, lat, lon, lat, lon);
+
+    //loadRealTile(mw, 53, 14, 54, 23);
 
     loadRealTile(mw, 49, 14, 54, 23);
 
