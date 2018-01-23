@@ -66,7 +66,7 @@ void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const Dis
                             const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps);
 
 void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
-                            const std::vector<std::pair<int, RealTile::Coloring>>& steps);
+                            const std::vector<RealTileSample>& steps);
 
 /**
  * Terminate MapWidget before the application terminates

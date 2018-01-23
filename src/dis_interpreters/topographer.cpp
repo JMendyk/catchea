@@ -152,18 +152,18 @@ inline RealTile::Coloring sample_gradient(const RealTile::Coloring& start, const
 void Topographer__interpret(RealTile* real_tile,
                             const RealTile::Coloring &lower,
                             const RealTile::Coloring &upper,
-                            const std::vector<std::pair<int, RealTile::Coloring>> &steps) {
+                            const std::vector<RealTileSample> &steps) {
     //START_BENCH(interpret_color)
 
     for(size_t it = 0; it <= (real_tile->height * real_tile->width); it++) {
-        if(real_tile->heights[it] < steps.begin()->first) {
+        if(real_tile->heights[it] < steps.begin()->height) {
             real_tile->coloring[it] = lower;
-        } else if((steps.end()-1)->first < real_tile->heights[it]) {
+        } else if((steps.end()-1)->height < real_tile->heights[it]) {
             real_tile->coloring[it] = upper;
         } else for(auto step = steps.begin(); step != steps.end(); step++) {
-                if(real_tile->heights[it] <= step->first) {
-                    float grad_norm = ((float)(real_tile->heights[it] - (step-1)->first)/(step->first - (step-1)->first));
-                    real_tile->coloring[it] = sample_gradient((step-1)->second, step->second, grad_norm);
+                if(real_tile->heights[it] <= step->height) {
+                    float grad_norm = ((float)(real_tile->heights[it] - (step-1)->height)/(step->height - (step-1)->height));
+                    real_tile->coloring[it] = sample_gradient((step-1)->coloring, step->coloring, grad_norm);
                     break;
                 }
             }

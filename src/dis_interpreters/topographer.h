@@ -24,7 +24,7 @@ DisTile* Topographer__interpret_param(GeoTile* geo_tile, const DisTileSample& lo
 void Topographer__interpret(RealTile* real_tile,
                             const RealTile::Coloring &lower,
                             const RealTile::Coloring &upper,
-                            const std::vector<std::pair<int, RealTile::Coloring>> &steps);
+                            const std::vector<RealTileSample> &steps);
 
 
 DisTile* Topographer__interpret(GeoTile* geo_tile, int is_color);

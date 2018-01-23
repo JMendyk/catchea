@@ -27,6 +27,11 @@ struct RealTile {
     Texture* tex;
 };
 
+struct RealTileSample {
+    signed int height;
+    RealTile::Coloring coloring;
+};
+
 bool operator==(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs);
 bool operator!=(const RealTile::Coloring& lhs, const RealTile::Coloring& rhs);
 

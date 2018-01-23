@@ -69,6 +69,7 @@ bool App__init(App* app) {
     ImGuiIO& io = ImGui::GetIO();
     static ImFontConfig defaultFontConfig = ImFontConfig();
     io.Fonts->AddFontFromFileTTF("res/fonts/Roboto-Medium.ttf", 15.0f, &defaultFontConfig);
+    io.Fonts->AddFontFromFileTTF("res/fonts/Roboto-Medium.ttf", 20.0f, &defaultFontConfig);
 
     ImGui::GetStyle().WindowRounding = 0.0f;
 

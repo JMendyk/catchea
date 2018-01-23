@@ -45,41 +45,54 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         ImGui::SetWindowPos(window_pos, ImGuiCond_Always);
         ImGui::SetWindowSize(window_size, ImGuiCond_Always);
 
+        float column_margin = 2 * ImGui::GetStyle().ItemSpacing.x;
 
         static const RealTile::Coloring steps_lower = {000, 000, 000, 255};
         static const RealTile::Coloring steps_upper = {000, 000, 000, 255};
 
-        static const std::vector<std::pair<int, RealTile::Coloring>> preset_color = {
+        static const std::vector<RealTileSample> preset_color = {
                 { 0000, {000, 000, 255, 255} },
                 { 0000, {000, 255, 000, 255} },
                 { 0300, {255, 255, 000, 255} },
                 { 2000, {255, 000, 000, 255} },
         };
 
-        static const std::vector<std::pair<int, RealTile::Coloring>> preset_black_and_white = {
+        static const std::vector<RealTileSample> preset_black_and_white = {
                 { 0000, { 000, 000, 000, 255 } },
                 { 2000, { 255, 255, 255, 255 } },
         };
 
-        static std::vector<std::pair<int, RealTile::Coloring>> steps = preset_color;
+        static std::vector<RealTileSample> steps = preset_color;
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
                             ImVec2(ImGui::GetStyle().ItemSpacing.x, 2 * ImGui::GetStyle().ItemSpacing.y));
 
-        ImGui::Text("Elevation Coloring");
+        ImGui::Text(1, "Elevation Coloring");
+        ImGui::Separator();
+
+        ImGui::Text("Presets:");
+        ImGui::Columns(2, NULL, false);
+
+        if (ImGui::Button("Black and White", ImVec2(ImGui::GetColumnWidth() - column_margin/2, 0))) {
+            steps = preset_black_and_white;
+        }
+        ImGui::NextColumn();
+        if (ImGui::Button("Standard Colors", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
+            steps = preset_color;
+        }
+
+        ImGui::Columns(1);
+        ImGui::Text("Customization:");
 
         ImGui::Columns(5, NULL, false);
         ImGui::SetColumnWidth(0, 29);
         ImGui::SetColumnWidth(1, 29);
         ImGui::SetColumnWidth(2, 29);
 
-        float column_margin = 2 * ImGui::GetStyle().ItemSpacing.x;
-
-        typedef std::vector<std::pair<int, RealTile::Coloring>>::iterator iter;
+        typedef std::vector<RealTileSample>::iterator iter;
         iter prev, next;
 
-
-        for (auto step = steps.begin(); steps.size() > 0 && step != steps.end(); step++) {
+        for (iter step = steps.begin(); steps.size() > 0 && step < steps.end(); step++) {
             float total_width = 0;
 
             ImGui::PushID((int) std::distance(steps.begin(), step));
@@ -89,7 +102,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                 if (ImGui::Button("/\\", ImVec2(ImGui::GetColumnWidth() - column_margin / 2, 0))) {
                     prev = step - 1;
                     next = step;
-                    std::swap(prev->first, next->first);
+                    std::swap(prev->height, next->height);
                     iter_swap(prev, next);
                 }
             }
@@ -100,7 +113,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
                 if (ImGui::Button("\\/", ImVec2(ImGui::GetColumnWidth() - column_margin / 2, 0))) {
                     prev = step;
                     next = step + 1;
-                    std::swap(prev->first, next->first);
+                    std::swap(prev->height, next->height);
                     iter_swap(prev, next);
                 }
             }
@@ -108,28 +121,28 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
             ImGui::NextColumn();
 
             {
-                RealTile::Coloring dts = step->second;
+                RealTile::Coloring dts = step->coloring;
                 float sc = 1.0f / 255.0f;
                 float color[3] = {sc * dts.red, sc * dts.green, sc * dts.blue};
                 ImGui::PushItemWidth(ImGui::GetColumnWidth()/* - column_margin*/);
                 ImGui::ColorEdit3("", color, ImGuiColorEditFlags_NoInputs);
-                step->second.red = static_cast<unsigned char>(color[0] / sc);
-                step->second.green = static_cast<unsigned char>(color[1] / sc);
-                step->second.blue = static_cast<unsigned char>(color[2] / sc);
+                step->coloring.red =   (unsigned char) (color[0] / sc);
+                step->coloring.green = (unsigned char) (color[1] / sc);
+                step->coloring.blue =  (unsigned char) (color[2] / sc);
             }
 
             total_width += ImGui::GetColumnWidth();
             ImGui::NextColumn();
 
             {
-                int x = step->first;
-                int v_min = step == steps.begin() ? x - 1000 : (step - 1)->first;
-                int v_max = step + 1 == steps.end() ? x + 1000 : (step + 1)->first;
+                int x = step->height;
+                int v_min = step == steps.begin()   ? (x - 1000) : (step - 1)->height;
+                int v_max = step + 1 == steps.end() ? (x + 1000) : (step + 1)->height;
 
                 ImGui::PushItemWidth(ImGui::GetColumnWidth() - column_margin / 2);
-                ImGui::DragInt("2", &step->first, 1.0f, v_min, v_max);
+                ImGui::DragInt("", &x, 1.0f, v_min, v_max, "%.0f m n.p.m.");
 
-                step->first = x;
+                step->height = x;
             }
 
             total_width += ImGui::GetColumnWidth();
@@ -149,114 +162,55 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
 
         }
 
-        ImGui::Columns(1);
+        ImGui::Columns(2, NULL, false);
 
-        if (ImGui::Button("Add")) {
+        if (ImGui::Button("+", ImVec2(ImGui::GetColumnWidth() - column_margin / 2, 0))) {
             steps.insert(steps.end(),
-                         {(steps.end() - 1)->first, {000, 000, 000, 255}});
+                         {(steps.end() - 1)->height, {000, 000, 000, 255}});
         }
+        ImGui::NextColumn();
 
-        if (ImGui::Button("Apply changes")) {
+        if (ImGui::Button("Start coloring", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
             MapWidget__update_tile2(cw->app->mapWidget, steps_lower, steps_upper, steps);
         }
 
         ImGui::Separator();
+        ImGui::Separator();
+
+        ImGui::Columns(1);
 
         bool catchmented = false;
         srand(1);
 
-        ImGui::Text("Catchmenting with K4");
+        ImGui::Text(1, "Catchment area generation");
 
-        ImGui::Columns(2);
-        ImGui::PushID("catchmenting_k4");
-
-        if (ImGui::Button("Normal", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all(cw->app->realTile, K4);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("Immediate", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all_immediate(cw->app->realTile, K4);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("HM Normal", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all(cw->app->realTile, K4_HARD_MIN);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("HM Immediate", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
+        if (ImGui::Button("K4 Immediate", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;
             Catchmenter__color_all_immediate(cw->app->realTile, K4_HARD_MIN);
         }
-        ImGui::NextColumn();
-        if (ImGui::Button("Heightwise", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K4);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("HM Heightwise", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
+        if (ImGui::Button("K4 Heightwise", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;
             Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K4_HARD_MIN);
         }
-        ImGui::NextColumn();
-
-        ImGui::PopID();
-
-        ImGui::Separator();
-
-        ImGui::Columns(1);
-        ImGui::Text("Catchmenting with K8");
-
-        ImGui::Columns(2);
-        ImGui::PushID("catchmenting_k8");
-
-        if (ImGui::Button("Normal", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all(cw->app->realTile, K8);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("Immediate", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all_immediate(cw->app->realTile, K8);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("HM Normal", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all(cw->app->realTile, K8_HARD_MIN);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("HM Immediate", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
+        if (ImGui::Button("K8 Immediate", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;
             Catchmenter__color_all_immediate(cw->app->realTile, K8_HARD_MIN);
         }
-        ImGui::NextColumn();
-        if (ImGui::Button("Heightwise", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K8);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button("HM Heightwise", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
+        if (ImGui::Button("K8 Heightwise", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;
             Catchmenter__color_all_immediate_heightwise(cw->app->realTile, K8_HARD_MIN);
         }
-        ImGui::NextColumn();
-        if (ImGui::Button("All", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
-            catchmented = true;
-            Catchmenter__all(cw->app->realTile, K8);
-        }
-        ImGui::NextColumn();
-        if (ImGui::Button(" HM All", ImVec2(ImGui::GetColumnWidth() - column_margin, 0))) {
+        if (ImGui::Button("K8 Disjunctive", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;
             Catchmenter__all(cw->app->realTile, K8_HARD_MIN);
         }
-        ImGui::NextColumn();
-
-        ImGui::PopID();
 
         if (catchmented) {
             RealTile__texture_generate(cw->app->realTile);
         }
+
+        ImGui::Separator();
+        ImGui::Separator();
 
         ImGui::PopStyleVar();
 
