@@ -4,7 +4,7 @@
  * @date 07.01.18
  */
 
-#include <math.h>
+#include <cmath>
 #include <cstdio>
 #include <dis_interpreters/catchmenter.h>
 #include <resource_manager.h>
@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include <time.h>
+#include <ctime>
 #include <utils.h>
 #include "real_tile/hgt_plugin.h"
 
@@ -272,46 +272,10 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
     ImGui::PopStyleVar(2);
 }
 
-//void MapWidget__update_tile(MapWidget* mw) {
-//    if(mw->app->disTile != NULL) {
-//        rm_free_texture(mw->texTile);
-//        DisTile__destroy(mw->app->disTile);
-//    }
-//    mw->app->disTile = Topographer__interpret(mw->app->geoTile, mw->is_color);
-//    mw->texTile = DisTile__to_texture(mw->app->disTile);
-//}
-//
-//void MapWidget__update_tile(MapWidget* mw, const DisTileSample& lower, const DisTileSample& upper,
-//                            const std::vector< std::pair<DisTileSample, geo_sample_t> >& steps) {
-//    START_BENCH(MapWidget__update_tile)
-//
-//    if(mw->app->disTile != NULL) {
-//        rm_free_texture(mw->texTile);
-//        DisTile__destroy(mw->app->disTile);
-//    }
-//
-//    mw->app->disTile = Topographer__interpret_param(mw->app->geoTile, lower, upper, steps);
-//    mw->texTile = DisTile__to_texture(mw->app->disTile);
-//
-//    STOP_BENCH(MapWidget__update_tile)
-//
-//    fprintf(stderr, "MapWidget__update_tile %.2lf\n", GET_BENCH(MapWidget__update_tile));
-//}
-
-//void MapWidget__update_tile2(MapWidget* mw, const RealTile::Coloring& lower, const RealTile::Coloring& upper,
-//                            const std::vector<RealTileSample>& steps) {
-//    START_BENCH(MapWidget__update_tile2)
-//
-//    Topographer__interpret(mw->app->realTile, lower, upper, steps);
-//    RealTile__texture_generate(mw->app->realTile);
-//
-//    STOP_BENCH(MapWidget__update_tile2)
-//
-//    fprintf(stderr, "MapWidget__update_tile2 %.2lf\n", GET_BENCH(MapWidget__update_tile2));
-//}
-
 bool MapWidget__terminate(MapWidget* mw) {
     rm_free_texture(mw->texTile);
+
+    RealTile__destroy(mw->app->realTile);
 
     return true;
 }

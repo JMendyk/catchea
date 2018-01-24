@@ -7,7 +7,7 @@
 #ifndef CATCHEA_MENU_WIDGET_H
 #define CATCHEA_MENU_WIDGET_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <imgui.h>
 #include <imgui_internal.h>

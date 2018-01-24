@@ -7,7 +7,7 @@
 #ifndef CATCHEA_FOOTER_WIDGET_H
 #define CATCHEA_FOOTER_WIDGET_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <imgui.h>
 

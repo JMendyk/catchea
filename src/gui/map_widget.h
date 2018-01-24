@@ -7,7 +7,7 @@
 #ifndef CATCHEA_MAP_WIDGET_H
 #define CATCHEA_MAP_WIDGET_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <imgui.h>
 #include <vector>

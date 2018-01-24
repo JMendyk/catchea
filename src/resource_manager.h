@@ -7,7 +7,7 @@
 #ifndef CATCHEA_RESOURCE_MANAGER_H
 #define CATCHEA_RESOURCE_MANAGER_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <GL/gl.h>
 

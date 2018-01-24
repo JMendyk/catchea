@@ -7,7 +7,7 @@
 #ifndef CATCHEA_CONTROL_WIDGET_H
 #define CATCHEA_CONTROL_WIDGET_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <imgui.h>
 
