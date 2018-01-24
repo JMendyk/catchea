@@ -67,13 +67,13 @@ bool MapWidget__init(MapWidget* mw, App* app) {
     int lat = rand() % (54-49+1) + 49;
     int lon = rand() % (23-14+1) + 14;
 
-    //loadRealTile(mw, lat, lon, lat+2, lon+2);
+    loadRealTile(mw, lat, lon, lat, lon);
     //
     //loadGeoTile(mw, lat, lon, lat, lon);
 
     //loadRealTile(mw, 53, 14, 54, 23);
 
-    loadRealTile(mw, 49, 14, 54, 23);
+    //loadRealTile(mw, 49, 14, 54, 23);
 
     //loadGeoTile(mw, 49, 14, 54, 23);
 
@@ -184,7 +184,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
         ImVec2 new_offset_centered = old_offset_centered * scale_change;
 
-        ImVec2 new_offset = new_offset_centered - center_point - scrolling;
+        ImVec2 new_offset = ImGui::IsWindowHovered() ? (new_offset_centered - center_point - scrolling) : old_offset;
 
         ImGui::SetScrollX(new_offset.x);
         ImGui::SetScrollY(new_offset.y);
