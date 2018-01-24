@@ -5,6 +5,7 @@
  */
 
 #include <app.h>
+#include <real_tile/hgt_plugin.h>
 #include "app.h"
 
 #include "menu_widget.h"
@@ -54,9 +55,126 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
         ImGui::VerticalSeparator();
         ImGui::SameLine();
 
-        ImGui::ImageButton((ImTextureID)mw->btn_tex_tile.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0);
-        ImGui::SameLine();
-        ImGui::VerticalSeparator();
+
+        bool open = true;
+
+        if(ImGui::ImageButton((ImTextureID)mw->btn_tex_tile.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0)) {
+            fprintf(stderr, "open %d, ", open);
+            ImGui::OpenPopup("Load multiple tiles");
+            fprintf(stderr, "%d\n", open);
+        }
+
+        ImGui::SetNextWindowPos(popup_pos, ImGuiCond_Always);
+        ImGui::SetNextWindowSize(popup_size, ImGuiCond_Always);
+
+        if (ImGui::BeginPopupModal("Load multiple tiles", &open)) {
+            ImGui::TextWrapped(
+                    "This utility helps load multiple tiles and join them to single tile.\n"
+                    "Please, provide path to folder with HGT files that have format like \"N49E014.hgt\" "
+                    "(north/south, latitude, east/west, longitude). "
+                    "Then enter latitude and longitude of lower-left and upper-right corners of rectangle of tiles to load."
+            );
+
+            ImGui::Separator();
+
+            float width = ImGui::GetContentRegionAvailWidth()*2/3;
+
+            static char* chosen_folder = (char*) calloc(1, sizeof(char));
+            ImGui::Text("Folder with tile: ");
+            ImGui::PushID("chosen_folder");
+            ImGui::PushItemWidth(width*2/3);
+            ImGui::InputText("", chosen_folder, strlen(chosen_folder), ImGuiInputTextFlags_ReadOnly);
+            ImGui::SameLine();
+
+            float button_margin = ImGui::GetStyle().ItemSpacing.x;
+            const bool btn_choose = ImGui::Button("Choose", ImVec2(width*1/3 - button_margin, 0));
+            ImGui::PopID();
+
+            static ImGuiFs::Dialog tiling_dialog;
+            const char* tiling_folder = tiling_dialog.chooseFolderDialog(btn_choose, NULL, NULL, popup_size, popup_pos, 1.0f);
+
+            if(strlen(tiling_folder) > 0) {
+                if(chosen_folder != NULL)
+                    free(chosen_folder);
+                chosen_folder = (char*) calloc(strlen(tiling_folder)+1, sizeof(char));
+                strcpy(chosen_folder, tiling_folder);
+            }
+
+
+            ImGui::Text("Lat/lon of lower-left corner:");
+
+            static int min_cord[2];
+            static int max_cord[2];
+
+
+
+            ImGui::PushID("min");
+            ImGui::PushItemWidth(width);
+            ImGui::InputInt2("", min_cord);
+            ImGui::PopID();
+
+            ImGui::Text("Lat/lon of upper-right corner:");
+
+            ImGui::PushID("max");
+            ImGui::PushItemWidth(width);
+            ImGui::InputInt2("", max_cord);
+            ImGui::PopID();
+
+            static int error = 0;
+
+            if (ImGui::Button("Load", ImVec2(width, 0))) {
+                error = 0;
+
+                if (!ImGuiFs::DirectoryExists(chosen_folder)) {
+                    error |= 1 << 0;
+                }
+
+                if (!(min_cord[0] <= max_cord[0] && min_cord[1] <= max_cord[1])
+                   || !(-90 <= min_cord[0] && min_cord[0] <= 90)
+                   || !(-90 <= max_cord[0] && max_cord[0] <= 90)
+                   || !(-180 <= min_cord[1] && min_cord[1] <= 180)
+                   || !(-180 <= max_cord[1] && max_cord[1] <= 180)) {
+                    error |= 1 << 1;
+                } else {
+                    for (int lat = min_cord[0]; lat <= max_cord[0]; lat++) {
+                        for (int lon = min_cord[1]; lon <= max_cord[1]; lon++) {
+                            char* full_path = hgt_path_for(chosen_folder, lat, lon);
+                            if(!ImGuiFs::FileExists(full_path)) {
+                                error |= 1 << 2;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (error == 0) {
+                    mw->app->realTile = RealTile__from_hgt_file_batch(chosen_folder, min_cord[0], min_cord[1], max_cord[0], max_cord[1]);
+                    RealTile__apply_default_coloring(mw->app->realTile);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (error) {
+                ImVec4 color = ImColor(255, 0, 0).Value;
+                ImGui::TextColored(color, "Errors encountered:");
+                if (error & 1 << 0) ImGui::TextColored(color, "Provided folder does not exist.");
+                if (error & 1 << 1) ImGui::TextColored(color, "Coordinates invalid.");
+                if (error & 1 << 2) {
+                    for (int lat = min_cord[0]; lat <= max_cord[0]; lat++) {
+                        for (int lon = min_cord[1]; lon <= max_cord[1]; lon++) {
+                            char* full_path = hgt_path_for(chosen_folder, lat, lon);
+                            if(!ImGuiFs::FileExists(full_path)) {
+                                char* bad_filename = hgt_path_for("", lat, lon);
+                                ImGui::TextColored(color, "File %s does not exist in given folder!", bad_filename);
+                            }
+                        }
+                    }
+                }
+            }
+
+            ImGui::EndPopup();
+        }
+
         ImGui::SameLine();
 
         //if(ImGui::ImageButton((ImTextureID)mw->btn_tex_topo.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0)) {
