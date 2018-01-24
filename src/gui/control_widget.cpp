@@ -8,13 +8,9 @@
 
 #include <vector>
 #include <algorithm>
-#include <dis_tile/dis_tile.h>
 #include <imgui_internal.h>
 #include <dis_interpreters/catchmenter.h>
 #include <dis_interpreters/topographer.h>
-
-#include "geo_tile/geo_tile.h"
-#include "dis_tile/dis_tile.h"
 
 #include "app.h"
 

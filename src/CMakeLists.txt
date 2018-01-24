@@ -17,11 +17,6 @@ target_sources(${EXECUTABLE_NAME}
         ${SRC_DIR}/real_tile/real_tile.cpp
         ${SRC_DIR}/real_tile/hgt_plugin.cpp
 
-        ${SRC_DIR}/geo_tile/geo_tile.cpp
-        ${SRC_DIR}/geo_tile/geo_tile_hgt_plugin.cpp
-
-        ${SRC_DIR}/dis_tile/dis_tile.cpp
-
         ${SRC_DIR}/dis_interpreters/topographer.cpp
         ${SRC_DIR}/dis_interpreters/catchmenter.cpp
 

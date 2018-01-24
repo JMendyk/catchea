@@ -12,6 +12,17 @@
 #include <cstring>
 #include <cstdio>
 
+char* hgt_path_for(char* folder_path, int lat, int lon) {
+    char* filename = (char*) calloc(strlen(folder_path)+20, sizeof(char));
+    sprintf(filename, "%s%s%c%02d%c%03d.hgt",
+            folder_path,
+            strlen(folder_path) > 0 ? "/" : "",
+            lat >= 0 ? 'N' : 'S', abs(lat),
+            lon >= 0 ? 'E' : 'W', abs(lon)
+    );
+    return filename;
+}
+
 RealTile* RealTile__from_hgt_file(const char* filename) {
     char lat_side, lon_side;
     int lat, lon;

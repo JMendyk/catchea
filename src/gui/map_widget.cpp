@@ -16,6 +16,7 @@
 #include <string>
 
 #include <time.h>
+#include <utils.h>
 #include "real_tile/hgt_plugin.h"
 
 MapWidget* MapWidget__create() {
@@ -311,9 +312,6 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
 bool MapWidget__terminate(MapWidget* mw) {
     rm_free_texture(mw->texTile);
-
-    DisTile__destroy(mw->app->disTile);
-    GeoTile__destroy(mw->app->geoTile);
 
     return true;
 }

@@ -12,6 +12,8 @@
 #define SAMPLES_PER_AXIS 1201
 #define SAMPLES_PER_TILE (SAMPLES_PER_AXIS*SAMPLES_PER_AXIS)
 
+char* hgt_path_for(char* folder_path, int lat, int lon);
+
 /**
  * Create RealTile from HGT file, deducing tile's coordinates based on filename
  * @param [in] filename path to HGT file

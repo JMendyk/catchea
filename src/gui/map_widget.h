@@ -14,10 +14,6 @@
 
 #include "resource_manager.h"
 
-#include "geo_tile/geo_tile.h"
-#include "geo_tile/geo_tile_hgt_plugin.h"
-#include "dis_tile/dis_tile.h"
-
 struct App;
 
 struct MapWidget {
