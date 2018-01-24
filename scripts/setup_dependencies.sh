@@ -34,7 +34,7 @@ rm -rf gl3w gl3w_repo \
        glfw glfw_repo \
        imgui imgui_repo \
        imgui_impl_glfw_gl3 \
-       stb_repo stb_image
+       stb_repo stb_image stb_image_write
 
 echo $HEADER >> $HISTFILE
 
@@ -82,11 +82,14 @@ mv imgui_repo imgui
 
 ##### stb_image #####
 mkdir stb_image
+mkdir stb_image_write
 git clone https://github.com/nothings/stb stb_repo
 cd stb_repo
     git checkout master
     log_dependency_file stb_image stb_image.h
+    log_dependency_file stb_image stb_image_write.h
     cp stb_image.h ../stb_image/
+    cp stb_image_write.h ../stb_image_write/
 cd ..
 rm -rf stb_repo
 

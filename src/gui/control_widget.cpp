@@ -170,6 +170,7 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         srand(1);
 
         ImGui::Text(1, "Catchment area generation");
+        ImGui::Separator();
 
         if (ImGui::Button("K4 Immediate", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;

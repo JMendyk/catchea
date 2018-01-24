@@ -18,7 +18,7 @@ struct App;
 
 struct MenuWidget {
 
-    Texture btn_tex_open, btn_tex_tile, btn_tex_topo, btn_tex_catch;
+    Texture btn_tex_open, btn_tex_tile, btn_tex_topo, btn_tex_catch, btn_tex_export;
 
     App* app;
 

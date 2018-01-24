@@ -11,6 +11,9 @@
 #include "menu_widget.h"
 #include "map_widget.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 MenuWidget* MenuWidget__create() {
     MenuWidget* mw = (MenuWidget*) malloc(sizeof(MenuWidget));
     if(!mw) return mw;
@@ -24,6 +27,7 @@ bool MenuWidget__init(MenuWidget* mw, struct App* app) {
     mw->btn_tex_tile = rm_load_texture("res/assets/ic_border_outer_black_48dp.png");
     //mw->btn_tex_topo = rm_load_texture("res/assets/ic_terrain_black_48dp.png");
     //mw->btn_tex_catch = rm_load_texture("res/assets/ic_opacity_black_48dp.png");
+    mw->btn_tex_export = rm_load_texture("res/assets/ic_camera_alt_black_48dp.png");
 
     return true;
 }
@@ -91,7 +95,7 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
             ImGui::PopID();
 
             static ImGuiFs::Dialog tiling_dialog;
-            const char* tiling_folder = tiling_dialog.chooseFolderDialog(btn_choose, NULL, NULL, popup_size, popup_pos, 1.0f);
+            const char* tiling_folder = tiling_dialog.chooseFolderDialog(btn_choose, NULL, "Select folder with HGT files", popup_size, popup_pos, 1.0f);
 
             if(strlen(tiling_folder) > 0) {
                 if(chosen_folder != NULL)
@@ -176,12 +180,19 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
         }
 
         ImGui::SameLine();
+        ImGui::VerticalSeparator();
+        ImGui::SameLine();
 
-        //if(ImGui::ImageButton((ImTextureID)mw->btn_tex_topo.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0)) {
-        //    (mw->app)->mapWidget->is_color = 1 - (mw->app)->mapWidget->is_color;
-        //    MapWidget__update_tile((mw->app)->mapWidget);
-        //}
-        //ImGui::SameLine();
+        static ImGuiFs::Dialog export_dlg;
+
+        const bool btn_export = ImGui::ImageButton((ImTextureID)mw->btn_tex_export.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0);
+
+        const char* export_filename = export_dlg.saveFileDialog(btn_export, NULL, NULL, ".png", NULL, popup_size, popup_pos, 1.0f);
+
+        if(strlen(export_filename) > 0) {
+            stbi_write_png(export_filename, mw->app->realTile->width, mw->app->realTile->height, 4,
+                           mw->app->realTile->coloring, mw->app->realTile->width * sizeof(RealTile::Coloring));
+        }
 
         //ImGui::ImageButton((ImTextureID)mw->btn_tex_catch.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0);
         //ImGui::SameLine();
@@ -197,6 +208,7 @@ bool MenuWidget__terminate(MenuWidget* mw) {
     rm_free_texture(mw->btn_tex_tile);
     //rm_free_texture(mw->btn_tex_topo);
     //rm_free_texture(mw->btn_tex_catch);
+    rm_free_texture(mw->btn_tex_export);
 
     return true;
 }

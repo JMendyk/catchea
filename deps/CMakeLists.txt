@@ -55,3 +55,8 @@ target_sources(${EXECUTABLE_NAME}
 set(STB_IMAGE_DIR ${DEPS_DIR}/stb_image)
 
 target_include_directories(${EXECUTABLE_NAME} PRIVATE ${STB_IMAGE_DIR})
+
+###### stb_image_write #####
+set(STB_IMAGE_WRITE_DIR ${DEPS_DIR}/stb_image_write)
+
+target_include_directories(${EXECUTABLE_NAME} PRIVATE ${STB_IMAGE_WRITE_DIR})
