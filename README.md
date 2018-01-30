@@ -3,6 +3,15 @@
 
 ![logicon_promo](demo/catchea_demo.gif)
 
+## Documentation
+
+Initial documentation (before implementing the project)
+is available [here](https://github.com/JMendyk/catchea/blob/master/demo/catchea_pre_documentation.pdf).
+
+Usage instructions are available below.
+
+Dource code's documentation generated using Doxygen is [here](https://jmendyk.github.io/catchea/).
+
 ## Compile from sources
 
 Requirements:
@@ -30,8 +39,13 @@ to improve build speed.
 In project's root folder, directory `dist` will be created 
 with redistributable package.
 
+Then download HGT data files for the app using `scripts/download_tiles.py` to 
+`res/assets/tiles` directory inside app's folder.
+
 ## Usage
-When app starts it load example tile. To load own HGT files select "folder" icon it top-left
+Compiled version of the app is available in [releases](https://github.com/JMendyk/catchea/releases) tab.
+
+When app starts it loads example tile. To load own HGT files select "folder" icon it top-left
 corner. 
 
 You can also load multiple files using Top menu's second option. This modules

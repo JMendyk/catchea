@@ -9,7 +9,7 @@
  *
  * \section intro Introduction
  * This documentation provides information about Catchea's source code
- * to read initial and final documentation (in Polish) go <a href="google.com">here</a>.
+ * to read initial and final documentation (in Polish) go <a href="https://github.com/JMendyk/catchea/blob/master/demo/catchea_pre_documentation.pdf">here</a>.
  */
 
 #define NDEBUG
