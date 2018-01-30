@@ -16,6 +16,7 @@ struct App;
 struct ControlWidget {
 
     App* app;
+    int jumpMax;
 
 };
 

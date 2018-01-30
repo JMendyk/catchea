@@ -18,6 +18,7 @@
 #include <ctime>
 #include <utils.h>
 #include "real_tile/hgt_plugin.h"
+#include "control_widget.h"
 
 MapWidget* MapWidget__create() {
     MapWidget* mw = (MapWidget*) malloc(sizeof(MapWidget));
@@ -225,7 +226,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
             bool* visi_matrix = (bool*) calloc(mw->app->realTile->height * mw->app->realTile->width, sizeof(bool));
 
-            Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K4 : K4_HARD_MIN);
+            Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K4 : K4_HARD_MIN, mw->app->controlWidget->jumpMax);
 
             free(visi_matrix);
             //Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K4);
@@ -249,7 +250,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
             bool* visi_matrix = (bool*) calloc(mw->app->realTile->height * mw->app->realTile->width, sizeof(bool));
 
-            Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K8 : K8_HARD_MIN);
+            Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K8 : K8_HARD_MIN, mw->app->controlWidget->jumpMax);
 
             free(visi_matrix);
             //Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K8);

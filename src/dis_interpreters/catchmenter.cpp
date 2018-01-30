@@ -17,13 +17,18 @@
 #define FROM_CORD_X(pos, w) (pos % w)
 #define FROM_CORD_Y(pos, w) (pos / w)
 
+bool is_valid(const RealTile* tile, const int& pos_x, const int& pos_y) {
+    return 0 <= pos_x && pos_x < tile->width &&
+           0 <= pos_y && pos_y < tile->height;
+}
+
 bool is_local_minimum(const RealTile* tile, const int& pos_x, const int& pos_y, const Kernel& kernel) {
 
     for(int i = 0; i < kernel.count; i++) {
         int x = pos_x + kernel.dx[i];
         int y = pos_y + kernel.dy[i];
 
-        if(x < 0 || x >= tile->width || y < 0 || y >= tile->height)
+        if(!is_valid(tile, x, y))
             continue;
 
         if(tile->heights[TCORD(x, y)] < tile->heights[TCORD(pos_x, pos_y)]
@@ -98,7 +103,7 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
             int nx = pos.first + kernel.dx[i];
             int ny = pos.second + kernel.dy[i];
 
-            if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+            if(!is_valid(tile, nx, ny))
                 continue;
 
             if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
@@ -116,11 +121,19 @@ void Catchmenter__color_pixel(RealTile* tile, const int& x, const int& y, const 
     fprintf(stderr, "Catchmented in %lf\n", GET_BENCH(catchmenter));
 }
 
-void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, const int& from_y, const Kernel& kernel) {
-    //START_BENCH(catchmenter)
-    //
-    //fprintf(stderr, "Kernel %d with%s HM\n", kernel.count, kernel.hard_min ? "": "out");
+bool can_expand(RealTile* tile, int pos_x, int pos_y, int dx, int dy, int jump_max = 1) {
+    for(int jump_size = 1; jump_size <= jump_max; jump_size++) {
+        int nx = pos_x + jump_size * dx;
+        int ny = pos_y + jump_size * dy;
 
+        if(is_valid(tile, nx, ny) && tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos_x, pos_y, tile->width)])
+            return true;
+    }
+
+    return false;
+}
+
+void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, const int& from_y, const Kernel& kernel, int jump_max) {
     std::queue<std::pair<std::pair<int, int>, RealTile::Coloring>> q;
 
     RealTile::Coloring my_color = RealTile__random_color();
@@ -146,11 +159,11 @@ void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, con
             int nx = pos.first + kernel.dx[i];
             int ny = pos.second + kernel.dy[i];
 
-            if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+            if(!is_valid(tile, nx, ny))
                 continue;
 
             if(!visi_matrix[CORD(nx, ny, tile->width)]) {
-                if(tile->heights[CORD(nx, ny, tile->width)] >= tile->heights[CORD(pos.first, pos.second, tile->width)]) {
+                if(can_expand(tile, pos.first, pos.second, kernel.dx[i], kernel.dy[i], jump_max)) {
                     visi_matrix[CORD(nx, ny, tile->width)] = true;
                     tile->coloring[CORD(nx, ny, tile->width)] = color;
                     q.push(std::make_pair(std::make_pair(nx, ny), color));
@@ -158,13 +171,9 @@ void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, con
             }
         }
     }
-
-    //STOP_BENCH(catchmenter)
-    //
-    //fprintf(stderr, "Catchmented from (%d, %d) in %lf\n", from_x, from_y, GET_BENCH(catchmenter));
 }
 
-void Catchmenter__all(RealTile* tile, const Kernel& kernel) {
+void Catchmenter__all(RealTile* tile, const Kernel& kernel, int jump_max) {
     //START_BENCH(catchmenter)
 
 
@@ -186,7 +195,7 @@ void Catchmenter__all(RealTile* tile, const Kernel& kernel) {
             //if(visi_matrix[TCORD(px, py)]) {
             //    fprintf(stderr, "oppps... %d %d\n", px, py);
             //}
-            Catchmenter__from(tile, visi_matrix, px, py, kernel);
+            Catchmenter__from(tile, visi_matrix, px, py, kernel, jump_max);
             minimums_left--;
 
             if(minimums_left == 0) {
@@ -245,7 +254,7 @@ void Catchmenter__color_all(RealTile* tile, const Kernel& kernel) {
             int nx = pos.first + kernel.dx[i];
             int ny = pos.second + kernel.dy[i];
 
-            if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+            if(!is_valid(tile, nx, ny))
                 continue;
 
             if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
@@ -305,7 +314,7 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel) {
                     int nx = pos.first + kernel.dx[i];
                     int ny = pos.second + kernel.dy[i];
 
-                    if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+                    if(!is_valid(tile, nx, ny))
                         continue;
 
                     if(tile->coloring[CORD(nx, ny, tile->width)] == white) {
@@ -398,7 +407,7 @@ void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& k
                 int nx = pos.first + kernel.dx[i];
                 int ny = pos.second + kernel.dy[i];
 
-                if(nx < 0 || nx >= tile->width || ny < 0 || ny >= tile->height)
+                if(!is_valid(tile, nx, ny))
                     continue;
 
                 if(tile->coloring[CORD(nx, ny, tile->width)] == white) {

@@ -30,9 +30,9 @@ void Catchmenter__color_all_immediate(RealTile* tile, const Kernel& kernel);
 
 void Catchmenter__color_all_immediate_heightwise(RealTile* tile, const Kernel& kernel);
 
-void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, const int& from_y, const Kernel& kernel);
+void Catchmenter__from(RealTile* tile, bool* visi_matrix, const int& from_x, const int& from_y, const Kernel& kernel, int jump_max);
 
-void Catchmenter__all(RealTile* tile, const Kernel& kernel);
+void Catchmenter__all(RealTile* tile, const Kernel& kernel, int jump_max);
 
 
 #endif //CATCHEA_CATCHMENTER_H

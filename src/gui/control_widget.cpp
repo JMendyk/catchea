@@ -21,6 +21,8 @@ ControlWidget* ControlWidget__create() {
     ControlWidget* cw = (ControlWidget*) malloc(sizeof(ControlWidget));
     if (!cw) return cw;
 
+    cw->jumpMax = 1;
+
     return cw;
 }
 
@@ -186,12 +188,15 @@ void ControlWidget__render(ControlWidget* cw, const ImVec2& window_pos, const Im
         }
         if (ImGui::Button("K8 Disjunctive", ImVec2(ImGui::GetContentRegionAvailWidth(), 0))) {
             catchmented = true;
-            Catchmenter__all(cw->app->realTile, K8_HARD_MIN);
+            Catchmenter__all(cw->app->realTile, K8_HARD_MIN, cw->jumpMax);
         }
 
         if (catchmented) {
             RealTile__texture_generate(cw->app->realTile);
         }
+
+        ImGui::InputInt("Coloring jump", &cw->jumpMax, 1);
+        if(cw->jumpMax < 1) cw->jumpMax = 1;
 
         ImGui::Separator();
         ImGui::Separator();
