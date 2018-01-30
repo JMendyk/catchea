@@ -1,0 +1,9 @@
+<map id="MapWidget" name="MapWidget">
+<area shape="rect" id="node3" href="$structApp.html" title="App" alt="" coords="277,213,322,240"/>
+<area shape="rect" id="node2" href="$structTexture.html" title="Represents texture with dimensions and id in OpenGL. " alt="" coords="378,5,445,32"/>
+<area shape="rect" id="node4" href="$structRealTile.html" title="RealTile" alt="" coords="231,95,301,121"/>
+<area shape="rect" id="node8" href="$structMenuWidget.html" title="MenuWidget" alt="" coords="364,303,459,329"/>
+<area shape="rect" id="node6" href="$structControlWidget.html" title="ControlWidget" alt="" coords="148,303,253,329"/>
+<area shape="rect" id="node7" href="$structFooterWidget.html" title="FooterWidget" alt="" coords="5,303,105,329"/>
+<area shape="rect" id="node5" href="$structRealTile_1_1Coloring.html" title="RealTile::Coloring" alt="" coords="203,5,329,32"/>
+</map>

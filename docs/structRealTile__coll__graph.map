@@ -1,0 +1,4 @@
+<map id="RealTile" name="RealTile">
+<area shape="rect" id="node2" href="$structTexture.html" title="Represents texture with dimensions and id in OpenGL. " alt="" coords="5,5,72,32"/>
+<area shape="rect" id="node3" href="$structRealTile_1_1Coloring.html" title="RealTile::Coloring" alt="" coords="97,5,223,32"/>
+</map>

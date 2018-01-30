@@ -1,0 +1,10 @@
+<map id="src/resource_manager.h" name="src/resource_manager.h">
+<area shape="rect" id="node2" href="$menu__widget_8h.html" title="src/gui/menu_widget.h" alt="" coords="127,87,281,114"/>
+<area shape="rect" id="node5" href="$map__widget_8h.html" title="src/gui/map_widget.h" alt="" coords="315,87,461,114"/>
+<area shape="rect" id="node7" href="$map__widget_8cpp.html" title="src/gui/map_widget.cpp" alt="" coords="511,169,671,196"/>
+<area shape="rect" id="node8" href="$real__tile_8cpp.html" title="src/real_tile/real\l_tile.cpp" alt="" coords="536,80,651,121"/>
+<area shape="rect" id="node9" href="$resource__manager_8cpp.html" title="src/resource_manager.cpp" alt="" coords="675,87,851,114"/>
+<area shape="rect" id="node3" href="$app_8cpp.html" title="src/app.cpp" alt="" coords="5,169,96,196"/>
+<area shape="rect" id="node4" href="$menu__widget_8cpp.html" title="src/gui/menu_widget.cpp" alt="" coords="121,169,287,196"/>
+<area shape="rect" id="node6" href="$control__widget_8cpp.html" title="src/gui/control_widget.cpp" alt="" coords="311,169,486,196"/>
+</map>

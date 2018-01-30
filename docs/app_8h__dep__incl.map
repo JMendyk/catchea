@@ -1,0 +1,7 @@
+<map id="src/app.h" name="src/app.h">
+<area shape="rect" id="node2" href="$app_8cpp.html" title="src/app.cpp" alt="" coords="5,80,96,107"/>
+<area shape="rect" id="node3" href="$control__widget_8cpp.html" title="src/gui/control_widget.cpp" alt="" coords="121,80,295,107"/>
+<area shape="rect" id="node4" href="$map__widget_8cpp.html" title="src/gui/map_widget.cpp" alt="" coords="320,80,480,107"/>
+<area shape="rect" id="node5" href="$menu__widget_8cpp.html" title="src/gui/menu_widget.cpp" alt="" coords="505,80,671,107"/>
+<area shape="rect" id="node6" href="$main_8cpp.html" title="src/main.cpp" alt="" coords="695,80,793,107"/>
+</map>
