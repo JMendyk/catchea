@@ -27,23 +27,6 @@ MapWidget* MapWidget__create() {
     return mw;
 }
 
-//inline bool loadGeoTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
-//    START_BENCH(map_load)
-//
-//    mw->app->geoTile = GeoTile__from_hgt_file_batch("res/assets/tiles", lat_min, lon_min, lat_max, lon_max);
-//    if(!mw->app->geoTile)
-//        return false;
-//
-//    MapWidget__update_tile(mw, { 000, 000, 000, 255 }, { 255, 000, 000, 255 }, {
-//        std::make_pair((DisTileSample){ 000, 000, 000, 255 },      0),
-//        std::make_pair((DisTileSample){ 255, 255, 255, 255 },   2000)
-//    });
-//
-//    STOP_BENCH(map_load)
-//
-//    fprintf(stderr, "Total load time: %.2lf\n", GET_BENCH(map_load));
-//}
-
 inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, const int &lat_max, const int &lon_max) {
     START_BENCH(map_load)
 
@@ -60,9 +43,6 @@ inline bool loadRealTile(MapWidget* mw, const int &lat_min, const int &lon_min, 
 
 bool MapWidget__init(MapWidget* mw, App* app) {
     mw->app = app;
-    mw->is_color = 0;
-
-    //49, 14, 54, 23
 
     srand(time(NULL));
 
@@ -70,14 +50,6 @@ bool MapWidget__init(MapWidget* mw, App* app) {
     int lon = rand() % (23-14+1) + 14;
 
     loadRealTile(mw, lat, lon, lat, lon);
-    //
-    //loadGeoTile(mw, lat, lon, lat, lon);
-
-    //loadRealTile(mw, 53, 14, 54, 23);
-
-    //loadRealTile(mw, 49, 14, 54, 23);
-
-    //loadGeoTile(mw, 49, 14, 54, 23);
 
     return true;
 }
@@ -107,7 +79,6 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
         ImGui::SetWindowSize(window_size, ImGuiCond_Always);
 
         ImVec2 scrolling = ImVec2(0.0f, 0.0f);
-        //const ImVec2 scroll_bound = ImVec2((ImGui::GetContentRegionAvail().y)/mw->texTile.heights, (ImGui::GetContentRegionAvail().y)/mw->texTile.heights);
         const ImVec2 scroll_bound1 = ImVec2((ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height, (ImGui::GetContentRegionAvail().y)/mw->app->realTile->tex->height);
         const ImVec2 scroll_bound2 = ImVec2((ImGui::GetContentRegionAvail().x)/mw->app->realTile->tex->width, (ImGui::GetContentRegionAvail().x)/mw->app->realTile->tex->width);
         const ImVec2 scroll_bound = scroll_bound1.x > scroll_bound2.x ? scroll_bound1 : scroll_bound2;
@@ -116,10 +87,8 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
 
         ImVec2 initial_scale = scale;
 
-        //ImVec2 image_size = ImVec2(mw->texTile.width * scale.x, mw->texTile.heights * scale.y);
         ImVec2 image_size = ImVec2(mw->app->realTile->tex->width * scale.x, mw->app->realTile->tex->height * scale.y);
 
-        //ImGui::Image((ImTextureID)mw->texTile.texture_id, image_size);
         ImGui::Image((ImTextureID)mw->app->realTile->tex->texture_id, image_size);
 
         if ((ImGui::IsWindowHovered() || is_dragging) && !ImGui::IsAnyItemActive()) {
@@ -191,7 +160,6 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
         ImGui::SetScrollX(new_offset.x);
         ImGui::SetScrollY(new_offset.y);
 
-        //ImVec2 CELL_SIZE = ImVec2(image_size.x / mw->texTile.width, image_size.y / mw->texTile.heights);
         ImVec2 CELL_SIZE = ImVec2(image_size.x / mw->app->realTile->tex->width, image_size.y / mw->app->realTile->tex->height);
 
         if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z))) {
@@ -215,13 +183,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             // Updates existing DisTile instead of creating new one
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
 
-
-            //rm_free_texture(mw->texTile);
-            //RealTile__texture_dealloc(mw->app->realTile);
-
-            //cord.x = cord.x / image_size.x * mw->texTile.width;
             cord.x = cord.x / image_size.x * mw->app->realTile->tex->width;
-            //cord.y = cord.y / image_size.y * mw->texTile.heights;
             cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
             bool* visi_matrix = (bool*) calloc(mw->app->realTile->height * mw->app->realTile->width, sizeof(bool));
@@ -229,8 +191,6 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K4 : K4_HARD_MIN, mw->app->controlWidget->jumpMax);
 
             free(visi_matrix);
-            //Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K4);
-            //mw->texTile = DisTile__to_texture(mw->app->disTile);
             RealTile__texture_generate(mw->app->realTile);
         }
 
@@ -239,13 +199,7 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             // Updates existing DisTile instead of creating new one
             ImVec2 cord = ImGui::GetIO().MousePos - ImGui::GetWindowPos() - ImGui::GetWindowContentRegionMin();
 
-
-            //rm_free_texture(mw->texTile);
-            //RealTile__texture_dealloc(mw->app->realTile);
-
-            //cord.x = cord.x / image_size.x * mw->texTile.width;
             cord.x = cord.x / image_size.x * mw->app->realTile->tex->width;
-            //cord.y = cord.y / image_size.y * mw->texTile.heights;
             cord.y = cord.y / image_size.y * mw->app->realTile->tex->height;
 
             bool* visi_matrix = (bool*) calloc(mw->app->realTile->height * mw->app->realTile->width, sizeof(bool));
@@ -253,21 +207,9 @@ void MapWidget__render(MapWidget* mw, const ImVec2& window_pos, const ImVec2& wi
             Catchmenter__from(mw->app->realTile, visi_matrix, (int) cord.x, (int) cord.y, ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A)) ? K8 : K8_HARD_MIN, mw->app->controlWidget->jumpMax);
 
             free(visi_matrix);
-            //Catchmenter__color_pixel(mw->app->realTile, (int) cord.x, (int) cord.y, K8);
-            //mw->texTile = DisTile__to_texture(mw->app->disTile);
             RealTile__texture_generate(mw->app->realTile);
         }
 
-
-        //ImU32 GRID_COLOR = ImColor(200, 200, 200, 40);
-        //
-        //ImDrawList *dl = ImGui::GetWindowDrawList();
-
-        //const ImVec2 dl_origin = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMin();
-        //for (float x = 0; x < image_size.x; x += scale.x * 16)
-        //    dl->AddLine(ImVec2(x, 0.0f) + dl_origin, ImVec2(x, image_size.y) + dl_origin, GRID_COLOR);
-        //for (float y = 0; y < image_size.y; y += scale.y * 16)
-        //    dl->AddLine(ImVec2(0.0f, y) + dl_origin, ImVec2(image_size.x, y) + dl_origin, GRID_COLOR);
     }
     ImGui::End();
     ImGui::PopStyleVar(2);

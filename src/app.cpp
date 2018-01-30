@@ -63,10 +63,10 @@ bool App__init(App* app) {
     ImGui_ImplGlfwGL3_Init(app->window, true);
 
     /*
-         * Add default app font
-         * This must happen before initialization of any other app components
-         * since default app font must be defined as the first one.
-         */
+     * Add default app font
+     * This must happen before initialization of any other app components
+     * since default app font must be defined as the first one.
+     */
     ImGuiIO& io = ImGui::GetIO();
     static ImFontConfig defaultFontConfig = ImFontConfig();
     io.Fonts->AddFontFromFileTTF("res/fonts/Roboto-Medium.ttf", 15.0f, &defaultFontConfig);
@@ -181,10 +181,6 @@ void App__render(App* app) {
 }
 
 void App_file_open_request(App* app, const char* filename) {
-    //app->geoTile = GeoTile__from_hgt_file(filename);
-    //
-    //MapWidget__update_tile(app->mapWidget);
-
     RealTile__destroy(app->realTile);
     app->realTile = RealTile__from_hgt_file(filename);
     RealTile__apply_default_coloring(app->realTile);

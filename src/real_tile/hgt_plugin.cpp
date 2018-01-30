@@ -51,7 +51,7 @@ RealTile* RealTile__from_hgt_file(const char* filename, const int& lat, const in
     RealTile *real_tile = RealTile__create(lat, lon, 1, 1);
     if(!real_tile) return NULL;
 
-    if(!RealTile__data_alloc(real_tile, height, width)) return NULL;
+    if(!RealTile__coloring_alloc(real_tile, height, width)) return NULL;
 
     size_t read_samples = 0;
 
@@ -95,7 +95,7 @@ RealTile* RealTile__from_hgt_file_batch(
     int height = SAMPLES_PER_AXIS * lat_size - (lat_size-1);
     int width = SAMPLES_PER_AXIS * lon_size - (lon_size-1);
 
-    if(!RealTile__data_alloc(ret, height, width)) {
+    if(!RealTile__coloring_alloc(ret, height, width)) {
         RealTile__destroy(ret);
         return NULL;
     }
@@ -113,7 +113,7 @@ RealTile* RealTile__from_hgt_file_batch(
             int place_y = (SAMPLES_PER_AXIS-1) * (lat_max - curr_lat);
             int place_x = (SAMPLES_PER_AXIS-1) * (curr_lon - lon_min);
 
-            RealTile__data_place(ret, tile, place_y, place_x);
+            RealTile__coloring_place(ret, tile, place_y, place_x);
 
             RealTile__destroy(tile);
         }

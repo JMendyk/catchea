@@ -69,28 +69,7 @@ RealTile* RealTile__create(int lat, int lon, int lat_size, int lon_size) {
     return tile;
 }
 
-bool RealTile__is_equal(const RealTile* lhs, const RealTile* rhs) {
-    return lhs->lat == rhs->lat
-        && lhs->lon == rhs->lon
-        && lhs->lat_size == rhs->lat_size
-        && lhs->lon_size == rhs->lon_size
-        && lhs->width == rhs->width
-        && lhs->height == rhs->height;
-}
-
-bool RealTile__is_next_lat(const RealTile* first, const RealTile* next) {
-    return first->lat + first->lat_size == next->lat
-        && first->lon == next->lon
-        && first->lon_size == next->lon_size;
-}
-
-bool RealTile__is_next_lon(const RealTile* first, const RealTile* next) {
-    return first->lon + first->lon_size == next->lon
-        && first->lat == next->lat
-        && first->lat_size == next->lat_size;
-}
-
-bool RealTile__data_alloc(RealTile* tile, int height, int width) {
+bool RealTile__coloring_alloc(RealTile* tile, int height, int width) {
     assert(tile->coloring == NULL);
 
     tile->height = height;
@@ -102,7 +81,7 @@ bool RealTile__data_alloc(RealTile* tile, int height, int width) {
     return tile->coloring != NULL && tile->heights != NULL;
 }
 
-void RealTile__data_place(RealTile* tile, RealTile* place_tile, int place_y, int place_x) {
+void RealTile__coloring_place(RealTile* tile, RealTile* place_tile, int place_y, int place_x) {
     int tile_offset = place_y * tile->width + place_x;
     int data_offset = 0;
 
@@ -114,7 +93,7 @@ void RealTile__data_place(RealTile* tile, RealTile* place_tile, int place_y, int
     }
 }
 
-void RealTile__data_dealloc(RealTile* tile) {
+void RealTile__coloring_dealloc(RealTile* tile) {
     assert(tile->coloring != NULL);
 
     free(tile->coloring);
@@ -142,57 +121,14 @@ bool RealTile__texture_dealloc(RealTile* tile) {
     tile->tex = NULL;
 }
 
-//RealTile* RealTile__merge(const RealTile* first, const RealTile* second) {
-//    RealTile* merged = NULL;
-//
-//    if (RealTile__is_next_lat(first, second)) {
-//        merged = RealTile__create(first->lat, first->lon, first->lat_size + second->lat_size, first->lon_size);
-//        if (!merged) return merged;
-//
-//        int heights = first->heights + second->heights - 1;
-//        int width = first->width;
-//        if (RealTile__data_alloc(merged, heights, width)) return NULL;
-//
-//        int offset = 0;
-//        // WARNING: may crash if second->heights == 0
-//        memcpy(merged->coloring + offset, second->coloring, ((second->heights - 1) * second->width) * sizeof(RealTile::Data));
-//        offset += (second->heights - 1) * second->width;
-//
-//        memcpy(merged->coloring + offset, first->coloring, (first->heights * first->width) * sizeof(RealTile::Data));
-//        offset += first->heights * first->width;
-//
-//        assert(offset == heights * width);
-//    } else if (RealTile__is_next_lon(first, second)) {
-//        merged = RealTile__create(first->lat, first->lon, first->lat_size, first->lon_size + second->lon_size);
-//        if (!merged) return merged;
-//
-//        int heights = first->heights;
-//        int width = first->width + second->width - 1;
-//        if (RealTile__data_alloc(merged, heights, width)) return NULL;
-//
-//        int offset = 0;
-//        for (int h = 0; h < heights; h++) {
-//            // WARNING: may crash if first->width == 0
-//            memcpy(merged->coloring + offset, first->coloring + first->width * h, (first->width - 1) * sizeof(RealTile::Data));
-//            offset += first->width - 1;
-//            memcpy(merged->coloring + offset, second->coloring + second->width * h, (second->width) * sizeof(RealTile::Data));
-//            offset += second->width;
-//        }
-//
-//        assert(offset == heights * width);
-//    }
-//
-//    return merged;
-//}
-
 void RealTile__destroy(RealTile* tile) {
-    RealTile__data_dealloc(tile);
+    RealTile__coloring_dealloc(tile);
     RealTile__texture_dealloc(tile);
 
     free(tile);
 }
 
-bool RealTile__texture_generate(RealTile *tile) {
+void RealTile__texture_generate(RealTile* tile) {
     glDeleteTextures(1, &tile->tex->texture_id);
 
     tile->tex->width = tile->width;
@@ -240,11 +176,9 @@ bool RealTile__texture_generate(RealTile *tile) {
     glPixelStorei(GL_UNPACK_ROW_LENGTH, unpack_row_length);
     glPixelStorei(GL_UNPACK_SKIP_PIXELS, unpack_skip_pixels);
     glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_alignment);
-
-    return true;
 }
 
-bool RealTile__apply_default_coloring(RealTile* tile) {
+void RealTile__apply_default_coloring(RealTile* tile) {
     Topographer__interpret(tile, REALTILE_DEFAULT_COLORING_LOWER, REALTILE_DEFAULT_COLORING_UPPER, REALTILE_PRESET_COLOR);
     RealTile__texture_generate(tile);
 }

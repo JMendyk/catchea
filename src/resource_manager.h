@@ -30,6 +30,7 @@ struct Texture {
 Texture rm_load_texture(const char* filename);
 
 /**
+ * @deprecated
  * Load texture from memory buffer and register in OpenGL
  * @param [in] data memory buffer to register
  * @param [in] width buffer's width

@@ -38,42 +38,6 @@ void FooterWidget__render(FooterWidget* fw, const ImVec2& window_pos, const ImVe
             }
             ImGui::SameLine();
         }
-
-        /*
-         * Solution based on an answer to ImGui issue #934
-         * https://github.com/ocornut/imgui/issues/934#issuecomment-340231002
-         * I (@JMendyk) refactored mentioned solution using a for-loop
-         * thus order of elements is the same as they will appear on the screen
-         */
-
-        static const int elements_count = 4;
-
-        static float widths[elements_count];
-        static const float ItemSpacing = ImGui::GetStyle().ItemSpacing.x;
-        float pos = 0;
-
-        //for (int idx = elements_count - 1; idx >= 0; idx--) {
-        //    pos += widths[idx] + ItemSpacing;
-        //    ImGui::SameLine(ImGui::GetWindowWidth() - pos);
-        //    ImGui::BeginGroup();
-        //    if (idx == 0) {
-        //        ImGui::Text("Min: %d", -20);
-        //        ImGui::SameLine();
-        //        ImGui::VerticalSeparator();
-        //    } else if (idx == 1) {
-        //        ImGui::Text("Avg: %d", 67);
-        //        ImGui::SameLine();
-        //        ImGui::VerticalSeparator();
-        //    } else if (idx == 2) {
-        //        ImGui::Text("Max: %d", 2499);
-        //        ImGui::SameLine();
-        //        ImGui::VerticalSeparator();
-        //    } else if (idx == 3) {
-        //        ImGui::Text("File: %s", "file1.hgt");
-        //    }
-        //    ImGui::EndGroup();
-        //    widths[idx] = ImGui::GetItemRectSize().x;
-        //}
     }
     ImGui::End();
 }

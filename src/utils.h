@@ -19,6 +19,11 @@ double get_time();
 #define STOP_BENCH(name) double  bench_stop_##name = get_time();
 #define GET_BENCH(name) (bench_stop_##name - bench_start_##name)
 
+/**
+ * Get basename given path
+ * @param path path
+ * @return basename of path
+ */
 char* util_basename(char* path);
 
 #endif //CATCHEA_UTILS_H
