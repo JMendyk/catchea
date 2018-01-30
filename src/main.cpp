@@ -4,6 +4,14 @@
  * @date 05.01.18
  */
 
+/**
+ * @mainpage Catchea - Topographic Data Browser
+ *
+ * \section intro Introduction
+ * This documentation provides information about Catchea's source code
+ * to read initial and final documentation (in Polish) go <a href="google.com">here</a>.
+ */
+
 #define NDEBUG
 
 #include "app.h"
