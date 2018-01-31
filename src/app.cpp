@@ -37,6 +37,8 @@ App* App__create() {
     if(!app->footerWidget)
         return NULL;
 
+    app->realTile = NULL;
+
     return app;
 }
 
@@ -181,7 +183,9 @@ void App__render(App* app) {
 }
 
 void App_file_open_request(App* app, const char* filename) {
-    RealTile__destroy(app->realTile);
+    if(app->realTile != NULL)
+        RealTile__destroy(app->realTile);
+
     app->realTile = RealTile__from_hgt_file(filename);
     RealTile__apply_default_coloring(app->realTile);
 }

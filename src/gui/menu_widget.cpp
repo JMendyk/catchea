@@ -178,18 +178,25 @@ void MenuWidget__render(MenuWidget* mw, const ImVec2& window_pos, const ImVec2& 
         }
 
         ImGui::SameLine();
-        ImGui::VerticalSeparator();
-        ImGui::SameLine();
 
-        static ImGuiFs::Dialog export_dlg;
+        if(mw->app->realTile != NULL) {
 
-        const bool btn_export = ImGui::ImageButton((ImTextureID)mw->btn_tex_export.texture_id, ImVec2(sz, sz), ImVec2(0, 0), ImVec2(1, 1), 0);
+            ImGui::VerticalSeparator();
+            ImGui::SameLine();
 
-        const char* export_filename = export_dlg.saveFileDialog(btn_export, NULL, NULL, ".png", NULL, popup_size, popup_pos, 1.0f);
+            static ImGuiFs::Dialog export_dlg;
 
-        if(strlen(export_filename) > 0) {
-            stbi_write_png(export_filename, mw->app->realTile->width, mw->app->realTile->height, 4,
-                           mw->app->realTile->coloring, mw->app->realTile->width * sizeof(RealTile::Coloring));
+            const bool btn_export = ImGui::ImageButton((ImTextureID) mw->btn_tex_export.texture_id, ImVec2(sz, sz),
+                                                       ImVec2(0, 0), ImVec2(1, 1), 0);
+
+            const char* export_filename = export_dlg.saveFileDialog(btn_export, NULL, NULL, ".png", NULL, popup_size,
+                                                                    popup_pos, 1.0f);
+
+            if (strlen(export_filename) > 0) {
+                stbi_write_png(export_filename, mw->app->realTile->width, mw->app->realTile->height, 4,
+                               mw->app->realTile->coloring, mw->app->realTile->width * sizeof(RealTile::Coloring));
+            }
+
         }
     }
     ImGui::End();

@@ -18,8 +18,6 @@ struct App;
 
 struct MapWidget {
 
-    Texture texTile;
-
     App* app;
 
 };
